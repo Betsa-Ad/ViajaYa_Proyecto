@@ -1,0 +1,60 @@
+#CRUD de Destinos
+
+@baseUrl = http://localhost:3000
+@destinoId = dest-001 
+
+# Listar destinos activos
+GET {{baseUrl}}/api/destinos
+Content-Type: application/json
+
+# Crear nuevo destino
+POST {{baseUrl}}/api/destinos
+Content-Type: application/json
+
+{
+  "nombre": "Manuel Antonio",
+  "descripcion": "Parque Nacional con playas y fauna silvestre .",
+  "precioBase": 95000,
+  "capacidadDiaria": 12
+}
+
+
+# Crear destino con precio invalido
+POST {{baseUrl}}/api/destinos
+Content-Type: application/json
+
+{
+  "nombre": "Destino Invalido",
+  "descripcion": "Prueba de validacion.",
+  "precioBase": -500,
+  "capacidadDiaria": 5
+}
+
+### Editar destino existente
+PUT {{baseUrl}}/api/destinos/{{destinoId}}
+Content-Type: application/json
+
+{
+  "nombre": "Playa Tamarindo Actualizada",
+  "precioBase": 90000,
+  "capacidadDiaria": 15
+}
+
+# Editar destino que no existe
+PUT {{baseUrl}}/api/destinos/id-que-no-existe
+Content-Type: application/json
+
+{
+  "precioBase": 50000
+}
+
+#Regla de negocio: no se puede desactivar un destino ya inactivo.
+# Desactivar destino
+PATCH {{baseUrl}}/api/destinos/{{destinoId}}/desactivar
+Content-Type: application/json
+
+#Intentar desactivar un destino ya inactivo
+PATCH {{baseUrl}}/api/destinos/{{destinoId}}/desactivar
+Content-Type: application/json
+
+

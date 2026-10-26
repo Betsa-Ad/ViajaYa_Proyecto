@@ -1,0 +1,89 @@
+
+#Gestion de Reservas (RN-01, RN-02, RN-04)
+
+@baseUrl    = http://localhost:3000
+
+
+# cambiar segun reserva para saber de cual se esta haciendo la prueba
+@reservaId  = PEGAR-ID-AQUI 
+
+
+
+
+#Reserva con tarjeta terminada en dígito PAR 
+POST {{baseUrl}}/api/reservas
+Content-Type: application/json
+
+{
+  "destinoId":              "dest-001",
+  "clienteNombre":          "María López",
+  "clienteEmail":           "maria.lopez@correo.com",
+  "fechaViaje":             "2026-11-01",
+  "numPersonas":            2,
+  "ultimosDigitosTarjeta":  "5432"
+}
+
+# Reserva con tarjeta terminada en dígito impar
+POST {{baseUrl}}/api/reservas
+Content-Type: application/json
+
+{
+  "destinoId":              "dest-001",
+  "clienteNombre":          "Carlos Mora",
+  "clienteEmail":           "carlos.mora@correo.com",
+  "fechaViaje":             "2026-11-01",
+  "numPersonas":            1,
+  "ultimosDigitosTarjeta":  "9873"
+}
+
+#Intentar reservar mas personas de la capacidad maxima
+POST {{baseUrl}}/api/reservas
+Content-Type: application/json
+
+{
+  "destinoId":              "dest-001",
+  "clienteNombre":          "Grupo Turismo XL",
+  "clienteEmail":           "grupo@turismo.com",
+  "fechaViaje":             "2026-11-01",
+  "numPersonas":            11,
+  "ultimosDigitosTarjeta":  "1234"
+}
+
+# Consultar reserva por id
+GET {{baseUrl}}/api/reservas/{{reservaId}}
+Content-Type: application/json
+
+#Consultar reserva con id inexistente
+GET {{baseUrl}}/api/reservas/id-que-no-existe
+Content-Type: application/json
+
+
+#Reprogramar reserva con >48h de anticipación
+PATCH {{baseUrl}}/api/reservas/{{reservaId}}/reprogramar
+Content-Type: application/json
+
+{
+  "nuevaFecha": "2026-11-15"
+}
+
+# Reprogramar una reserva con ≤48h de anticipación
+# Para simular este caso:
+#   1. Crear una reserva nueva con fechaViaje = mañana (dentro de 48h).
+#   2. Copiar su ID aquí abajo y ejecutar el PATCH.
+PATCH {{baseUrl}}/api/reservas/ID-RESERVA-PROXIMA/reprogramar
+Content-Type: application/json
+
+{
+  "nuevaFecha": "2026-12-01"
+}
+
+# Cancelar reserva con >48h de anticipación
+PATCH {{baseUrl}}/api/reservas/{{reservaId}}/cancelar
+Content-Type: application/json
+
+
+#Cancelar una reserva con ≤48h de anticipación
+# Para simular: crea una reserva con fechaViaje = mañana, copia su ID aquí.
+PATCH {{baseUrl}}/api/reservas/ID-RESERVA-PROXIMA/cancelar
+Content-Type: application/json
+

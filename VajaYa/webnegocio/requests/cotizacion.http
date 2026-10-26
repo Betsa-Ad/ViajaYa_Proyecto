@@ -1,0 +1,39 @@
+
+# Prueba Cotizador (RN-03)
+@baseUrl = http://localhost:3000
+
+
+# 2 personas, precio 85000
+# 8 personas, precio 65000
+
+#Subtotal = precioBase × numPersonas
+#IVA      = Subtotal × 0.13
+#Total    = Subtotal + IVA
+
+### RN-03: Cotizacion valida 
+POST {{baseUrl}}/api/cotizar
+Content-Type: application/json
+{
+  "precioBase": 85000,
+  "numPersonas": 2
+}
+
+### RN-03: Precio base invalido  
+POST {{baseUrl}}/api/cotizar
+Content-Type: application/json
+
+{
+  "precioBase": 0,
+  "numPersonas": 3
+}
+
+### RN-03: numPersonas no es entero
+POST {{baseUrl}}/api/cotizar
+Content-Type: application/json
+
+{
+  "precioBase": 85000,
+  "numPersonas": 2.5
+}
+
+
