@@ -1,0 +1,54 @@
+#
+# Peticiones HTTP para el Rol del Gestor / Administrador
+# Cumple con CAR-05, CAR-06 y Autenticación JWT
+
+@baseUrl = http://localhost:3000
+@destinoId = 4
+
+### 1. Login Administrativo (Supabase + JWT)
+# @name login
+POST {{baseUrl}}/api/admin/login
+Content-Type: application/json
+
+{
+  "correo": "betsadasa02@gmail.com",
+  "contrasena": "12345"
+}
+
+### Extraer token generado en el login
+@token = {{login.response.body.token}}
+
+### 2. Creación de nuevo destino 
+POST {{baseUrl}}/api/destinos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nombre": "Monteverde Bosque Nuboso",
+  "descripcion": "Caminatas por puentes colgantes, tirolesas y avistamiento del quetzal.",
+  "precioBase": 75000,
+  "capacidadDiaria": 15
+}
+
+### 3. Edición de precio base o capacidad de un destino existente
+# Permite actualizar campos de un destino 
+PUT {{baseUrl}}/api/destinos/{{destinoId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "precioBase": 40000,
+  "capacidadDiaria": 14
+}
+
+### 4. Desactivación lógica de un destino 
+# Cambia el estado a INACTIVO sin eliminar el historial de reservas en BD
+PATCH {{baseUrl}}/api/destinos/{{destinoId}}/desactivar
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 5. Consulta general de reservas para auditoría y monitoreo (CAR-06: Ruta protegida con JWT)
+# Permite al Gestor auditar y monitorear todas las reservas registradas
+GET {{baseUrl}}/api/admin/reservas
+Content-Type: application/json
+Authorization: Bearer {{token}}

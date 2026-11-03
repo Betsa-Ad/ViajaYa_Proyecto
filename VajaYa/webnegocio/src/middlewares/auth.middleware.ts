@@ -1,8 +1,6 @@
-// ============================================================
-// middlewares/auth.middleware.ts
+
 // Middleware básico de autenticación JWT.
 // Verifica que el token sea válido antes de acceder a rutas protegidas.
-// ============================================================
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';

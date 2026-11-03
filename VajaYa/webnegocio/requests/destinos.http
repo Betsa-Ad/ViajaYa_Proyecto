@@ -1,27 +1,42 @@
-#CRUD de Destinos
+#CRUD de Destinos (CAR-05)
 
 @baseUrl = http://localhost:3000
-@destinoId = dest-001 
+@destinoId = 1 
 
-# Listar destinos activos
+###Login de Administrador (para obtener token Bearer)
+# @name login
+POST {{baseUrl}}/api/admin/login
+Content-Type: application/json
+
+{
+  "correo": "betsadasa02@gmail.com",
+  "contrasena": "12345"
+}
+
+### Extraer token
+@token = {{login.response.body.token}}
+
+### Listar destinos activos (Público / Catálogo)
 GET {{baseUrl}}/api/destinos
 Content-Type: application/json
 
-# Crear nuevo destino
+### Crear nuevo destino (Protegido - CAR-05)
 POST {{baseUrl}}/api/destinos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "nombre": "Manuel Antonio",
   "descripcion": "Parque Nacional con playas y fauna silvestre .",
   "precioBase": 95000,
-  "capacidadDiaria": 12
+  "capacidadDiaria": 10
 }
 
 
-# Crear destino con precio invalido
+### Crear destino con precio invalido (Protegido - CAR-05)
 POST {{baseUrl}}/api/destinos
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "nombre": "Destino Invalido",
@@ -30,9 +45,10 @@ Content-Type: application/json
   "capacidadDiaria": 5
 }
 
-### Editar destino existente
+### Editar destino existente (Protegido - CAR-05)
 PUT {{baseUrl}}/api/destinos/{{destinoId}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "nombre": "Playa Tamarindo Actualizada",
@@ -40,21 +56,25 @@ Content-Type: application/json
   "capacidadDiaria": 15
 }
 
-# Editar destino que no existe
-PUT {{baseUrl}}/api/destinos/id-que-no-existe
+### Editar destino que no existe (Protegido - CAR-05)
+PUT {{baseUrl}}/api/destinos/999999
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "precioBase": 50000
 }
 
 #Regla de negocio: no se puede desactivar un destino ya inactivo.
-# Desactivar destino
+### Desactivar destino (Protegido - CAR-05)
 PATCH {{baseUrl}}/api/destinos/{{destinoId}}/desactivar
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
-#Intentar desactivar un destino ya inactivo
+### Intentar desactivar un destino ya inactivo (Protegido - CAR-05)
 PATCH {{baseUrl}}/api/destinos/{{destinoId}}/desactivar
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
 
 

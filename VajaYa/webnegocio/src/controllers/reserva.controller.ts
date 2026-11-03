@@ -27,6 +27,26 @@ export class ReservaController {
     }
   };
 
+  //* Consulta una reserva por código — GET /api/reservas/codigo/:codigo
+  obtenerPorCodigo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const reserva = await this.service.obtenerPorCodigo(req.params.codigo);
+      res.status(200).json({ data: reserva });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  //* Consulta reservas por correo del cliente — GET /api/reservas/correo/:correo
+  obtenerPorCorreo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const reservas = await this.service.obtenerPorCorreo(req.params.correo);
+      res.status(200).json({ data: reservas });
+    } catch (err) {
+      next(err);
+    }
+  };
+
   //! RN-02: Cancela una reserva respetando la ventana de 48h — PATCH /api/reservas/:id/cancelar
   cancelar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

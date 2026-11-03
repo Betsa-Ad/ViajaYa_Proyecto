@@ -1,9 +1,8 @@
-// ============================================================
-// mocks/mock.repository.ts
+
 // Implementación en memoria de IDestinoRepository e IReservaRepository.
-// SOLO para desarrollo y pruebas locales — NO usar en producción.
+//! SOLO para desarrollo y pruebas locales 
 // Cuando webdatos esté listo, se inyectan las implementaciones reales.
-// ============================================================
+
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -17,9 +16,10 @@ import {
   Reserva,
   EstadoReserva,
   CreateReservaDto,
+  ReservaAuditoria,
 } from '../interfaces/IReservaRepository';
 
-// --------------- MOCK DESTINOS ---------------
+// MOCK DESTINOS 
 
 //* Repositorio en memoria para Destinos — simula la BD sin necesitar webdatos.
 export class MockDestinoRepository implements IDestinoRepository {
@@ -87,7 +87,7 @@ export class MockDestinoRepository implements IDestinoRepository {
   }
 }
 
-// --------------- MOCK RESERVAS ---------------
+//MOCK RESERVAS 
 
 //* Repositorio en memoria para Reservas — simula la BD sin necesitar webdatos.
 export class MockReservaRepository implements IReservaRepository {
@@ -143,5 +143,20 @@ export class MockReservaRepository implements IReservaRepository {
     if (index === -1) throw new Error('Reserva no encontrada');
     this.reservas[index].fechaViaje = nuevaFecha;
     return this.reservas[index];
+  }
+
+  //* Consulta una reserva por su código de confirmación.
+  async findByCodigo(codigo: string): Promise<Reserva | null> {
+    return this.reservas.find((r) => r.codigoConfirmacion === codigo) ?? null;
+  }
+
+  //* Consulta reservas por el correo del cliente.
+  async findByCorreo(correo: string): Promise<Reserva[]> {
+    return this.reservas.filter((r) => r.clienteEmail.toLowerCase() === correo.toLowerCase());
+  }
+
+  //* Consulta todas las reservas (para monitoreo y pruebas de auditoría).
+  async findAll(): Promise<ReservaAuditoria[]> {
+    return this.reservas;
   }
 }

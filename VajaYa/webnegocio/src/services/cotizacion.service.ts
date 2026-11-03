@@ -1,8 +1,5 @@
-// ============================================================
-// services/cotizacion.service.ts
-// Implementa RN-03: cálculo de tarifa SIN persistir en BD.
-// ============================================================
 
+// Implementa RN-03: cálculo de tarifa SIN persistir en BD.
 export interface CotizacionInput {
   precioBase: number;
   numPersonas: number;

@@ -7,7 +7,7 @@ Esta capa implementa el **patrón Repository** para aislar el acceso a la base d
 
 ## Responsabilidades
 - Implementar las interfaces `IDestinoRepository` e `IReservaRepository` definidas en `webnegocio/src/interfaces/`.
-- Realizar las consultas SQL a PostgreSQL usando un ORM (ej. TypeORM / Prisma) o `pg` directamente.
+- Realizar las consultas SQL a PostgreSQL usando un ORM  o `pg` directamente.
 - Exponer únicamente los métodos que la capa de negocio necesita; no contiene lógica de negocio.
 
 ## Contratos que debes implementar

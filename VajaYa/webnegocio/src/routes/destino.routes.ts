@@ -1,31 +1,31 @@
-// ============================================================
-// routes/destino.routes.ts
-// Define los 4 endpoints atómicos del CRUD de destinos.
-// ============================================================
 
+// Define los 4 endpoints atómicos del CRUD de destinos.
 import { Router } from 'express';
 import { DestinoController } from '../controllers/destino.controller';
 import { DestinoService } from '../services/destino.service';
-import { MockDestinoRepository } from '../mocks/mock.repository';
 
-//* Inyección de dependencias: repositorio Mock reemplazable por el real de webdatos.
-const repo = new MockDestinoRepository();
+// Repositorio real de webdatos conectado a Supabase.
+const { DestinoRepository } = require('@webdatos/destino.repository');
+import { authMiddleware } from '../middlewares/auth.middleware';
+
+//* Inyección de dependencias: repositorio real conectado a Supabase.
+const repo = new DestinoRepository();
 const service = new DestinoService(repo);
 const controller = new DestinoController(service);
 
 const router = Router();
 
-// GET  /api/destinos              → Listar destinos activos (también sirve como búsqueda/catálogo)
+// Listar destinos activos (público / catálogo)
 router.get('/', controller.listarActivos);
 
-// POST /api/destinos              → Crear destino
-router.post('/', controller.crear);
+// Crear destino (Protegido con JWT - CAR-05)
+router.post('/', authMiddleware, controller.crear);
 
-// PUT  /api/destinos/:id          → Editar destino completo
-router.put('/:id', controller.editar);
+// Editar destino completo (Protegido con JWT - CAR-05)
+router.put('/:id', authMiddleware, controller.editar);
 
 //! RN: Desactivación lógica — PATCH en lugar de DELETE para preservar el historial.
-// PATCH /api/destinos/:id/desactivar
-router.patch('/:id/desactivar', controller.desactivar);
+// Desactivar destino (Protegido con JWT - CAR-05)
+router.patch('/:id/desactivar', authMiddleware, controller.desactivar);
 
 export default router;

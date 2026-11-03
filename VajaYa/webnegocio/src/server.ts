@@ -1,8 +1,5 @@
-// ============================================================
-// server.ts
-// Punto de entrada del servidor — arranca Express en el puerto configurado.
-// ============================================================
 
+// Punto de entrada del servidor — arranca Express en el puerto configurado.
 import 'dotenv/config';
 import app from './app';
 
@@ -14,5 +11,6 @@ app.listen(PORT, () => {
   console.log(`   → Destinos:   http://localhost:${PORT}/api/destinos`);
   console.log(`   → Cotizar:    http://localhost:${PORT}/api/cotizar`);
   console.log(`   → Reservas:   http://localhost:${PORT}/api/reservas`);
+  console.log(`   → Admin:      http://localhost:${PORT}/api/admin`);
   console.log(`   → Health:     http://localhost:${PORT}/health`);
 });

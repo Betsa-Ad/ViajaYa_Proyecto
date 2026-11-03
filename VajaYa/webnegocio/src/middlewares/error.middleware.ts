@@ -1,8 +1,6 @@
-// ============================================================
-// middlewares/error.middleware.ts
+
 // Manejador centralizado de errores con formato RFC 7807.
 // Todas las rutas pasan por aquí cuando llaman next(err).
-// ============================================================
 
 import { Request, Response, NextFunction } from 'express';
 import { BusinessError } from '../services/reserva.service';

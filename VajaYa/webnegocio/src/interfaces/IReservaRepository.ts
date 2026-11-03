@@ -1,7 +1,5 @@
-// ============================================================
-// interfaces/IReservaRepository.ts
+
 // Contrato que webdatos debe implementar para reservas.
-// ============================================================
 
 export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
 
@@ -15,6 +13,14 @@ export interface Reserva {
   estado: EstadoReserva;
   codigoConfirmacion: string | null;
   createdAt: Date;
+}
+
+// Detalle ampliado de la reserva para monitoreo y auditoría administrativa (CAR-06)
+export interface ReservaAuditoria extends Reserva {
+  destinoNombre?: string;
+  subtotal?: number;
+  iva?: number;
+  total?: number;
 }
 
 export interface CreateReservaDto {
@@ -33,4 +39,7 @@ export interface IReservaRepository {
   create(data: CreateReservaDto & { estado: EstadoReserva; codigoConfirmacion: string | null }): Promise<Reserva>;
   updateEstado(id: string, estado: EstadoReserva): Promise<Reserva>;
   updateFecha(id: string, nuevaFecha: string): Promise<Reserva>;
+  findByCodigo?(codigo: string): Promise<Reserva | null>;
+  findByCorreo?(correo: string): Promise<Reserva[]>;
+  findAll?(): Promise<ReservaAuditoria[]>;
 }

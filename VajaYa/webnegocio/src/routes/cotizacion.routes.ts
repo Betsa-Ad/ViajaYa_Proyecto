@@ -1,8 +1,5 @@
-// ============================================================
-// routes/cotizacion.routes.ts
-// Endpoint independiente del cotizador puro (RN-03).
-// ============================================================
 
+// Endpoint independiente del cotizador puro (RN-03).
 import { Router } from 'express';
 import { CotizacionController } from '../controllers/cotizacion.controller';
 import { CotizacionService } from '../services/cotizacion.service';
@@ -13,7 +10,7 @@ const controller = new CotizacionController(service);
 
 const router = Router();
 
-// POST /api/cotizar → Calcula subtotal, IVA y total sin persistir
+//Calcula subtotal, IVA y total sin persistir
 router.post('/', controller.cotizar);
 
 export default router;

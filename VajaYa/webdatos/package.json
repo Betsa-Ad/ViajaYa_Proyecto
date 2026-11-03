@@ -1,0 +1,15 @@
+{
+  "name": "webdatos",
+  "version": "1.0.0",
+  "description": "Capa de Acceso a Datos - Sistema ViajaYa",
+  "main": "index.ts",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/pg": "^8.23.1",
+    "typescript": "^5.3.3"
+  }
+}

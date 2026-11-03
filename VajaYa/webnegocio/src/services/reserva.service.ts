@@ -1,18 +1,16 @@
-// ============================================================
-// services/reserva.service.ts
-// Lógica de negocio para reservas: aplica RN-01, RN-02 y RN-04.
-// ============================================================
 
+// Lógica de negocio para reservas: aplica RN-01, RN-02 y RN-04.
 import { v4 as uuidv4 } from 'uuid';
 import { IDestinoRepository } from '../interfaces/IDestinoRepository';
 import {
   IReservaRepository,
   Reserva,
   CreateReservaDto,
+  ReservaAuditoria,
 } from '../interfaces/IReservaRepository';
 import { CotizacionService } from './cotizacion.service';
 
-// --------------- Errores de negocio tipados ---------------
+// Errores de negocio tipados 
 
 export class BusinessError extends Error {
   constructor(
@@ -25,7 +23,7 @@ export class BusinessError extends Error {
   }
 }
 
-// --------------- Servicio ---------------
+// Servicio 
 
 export class ReservaService {
   private readonly cotizacionService = new CotizacionService();
@@ -87,11 +85,18 @@ export class ReservaService {
     //! RN-04: Dígito PAR → pago aprobado, genera código único 'VY-XXXX-XX'.
     const codigoConfirmacion = this.generarCodigoConfirmacion();
 
-    return this.reservaRepo.create({
-      ...data,
-      estado: 'CONFIRMADA',
-      codigoConfirmacion,
-    });
+    try {
+      return await this.reservaRepo.create({
+        ...data,
+        estado: 'CONFIRMADA',
+        codigoConfirmacion,
+      });
+    } catch (err: any) {
+      if (err.message && err.message.includes('Cupo insuficiente')) {
+        throw new BusinessError('Cupo insuficiente', err.message, 409);
+      }
+      throw err;
+    }
   }
 
   //* Obtiene una reserva por ID; lanza 404 si no existe.
@@ -101,6 +106,34 @@ export class ReservaService {
       throw new BusinessError('Reserva no encontrada', `No existe una reserva con ID ${id}.`, 404);
     }
     return reserva;
+  }
+
+  //* Obtiene una reserva por su código de confirmación.
+  async obtenerPorCodigo(codigo: string): Promise<Reserva> {
+    if (!this.reservaRepo.findByCodigo) {
+      throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por código.', 500);
+    }
+    const reserva = await this.reservaRepo.findByCodigo(codigo);
+    if (!reserva) {
+      throw new BusinessError('Reserva no encontrada', `No existe una reserva con el código ${codigo}.`, 404);
+    }
+    return reserva;
+  }
+
+  //* Obtiene las reservas asociadas al correo de un cliente.
+  async obtenerPorCorreo(correo: string): Promise<Reserva[]> {
+    if (!this.reservaRepo.findByCorreo) {
+      throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por correo.', 500);
+    }
+    return this.reservaRepo.findByCorreo(correo);
+  }
+
+  //* CAR-06: Lista todas las reservas registradas para monitoreo y auditoría administrativa.
+  async listarTodas(): Promise<ReservaAuditoria[]> {
+    if (!this.reservaRepo.findAll) {
+      throw new BusinessError('Operación no soportada', 'El repositorio no soporta listar todas las reservas.', 500);
+    }
+    return this.reservaRepo.findAll();
   }
 
   //! RN-02: Cancelación solo permitida si faltan ESTRICTAMENTE MÁS de 48 horas para el viaje.
@@ -146,7 +179,7 @@ export class ReservaService {
     return this.reservaRepo.updateFecha(id, nuevaFecha);
   }
 
-  // --------------- Helpers privados ---------------
+  // Helpers privados 
 
   //! RN-02: Calcula la diferencia en horas entre ahora (UTC) y la fecha del viaje.
   private validarVentana48h(fechaViaje: string, accion: string): void {

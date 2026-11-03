@@ -1,8 +1,7 @@
-// ============================================================
-// interfaces/IDestinoRepository.ts
+
 // Contrato que webdatos debe implementar para destinos.
-// webnegocio solo conoce esta interfaz, nunca la implementación real.
-// ============================================================
+// webnegocio solo conoce esta interfaz
+
 
 export interface Destino {
   id: string;
