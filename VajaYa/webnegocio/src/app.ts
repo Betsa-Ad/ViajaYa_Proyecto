@@ -15,6 +15,18 @@ const app = express();
 //* Parsea el body de las peticiones como JSON.
 app.use(express.json());
 
+//* Habilita CORS para permitir peticiones desde el frontend webpresentacion.
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 // Health check 
 //* Endpoint de salud para verificar que el servidor está en pie.
 app.get('/health', (_req, res) => {

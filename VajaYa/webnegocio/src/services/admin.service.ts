@@ -1,10 +1,9 @@
-
-// Lógica de autenticación JWT y gestión del Administrador.
+// Logica de autenticacion JWT y gestion del Administrador
 import jwt from 'jsonwebtoken';
 import { IAdminRepository } from '../interfaces/IAdminRepository';
 import { BusinessError } from './reserva.service';
 
-const JWT_SECRET = process.env.JWT_SECRET ?? 'viajaya_secret_dev_2024';
+const JWT_SECRET = process.env.JWT_SECRET || 'viajaya_secret_dev_2024';
 
 export interface AdminPayload {
   id: number;
@@ -21,29 +20,25 @@ export interface LoginResult {
 export class AdminService {
   constructor(private readonly adminRepo: IAdminRepository) {}
 
-  //* Valida credenciales contra la tabla administrador de Supabase y retorna token JWT
+  // Valida credenciales contra la tabla administrador y retorna token JWT
   async login(correo?: string, contrasena?: string): Promise<LoginResult> {
-    // Valida que ambos campos sean proporcionados
     if (!correo || !contrasena) {
       throw new BusinessError('Datos incompletos', 'Se requiere correo y contraseña.', 400);
     }
 
     const admin = await this.adminRepo.findByCorreo(correo);
 
-    // Valida existencia del administrador y coincidencia de contraseña
     if (!admin || admin.contrasenaHash !== contrasena) {
       throw new BusinessError('Credenciales inválidas', 'Correo o contraseña incorrectos.', 401);
     }
 
-    // Valida que el administrador se encuentre activo
     if (admin.estado.toUpperCase() !== 'ACTIVO') {
       throw new BusinessError('Cuenta inactiva', 'El usuario administrador está inactivo.', 403);
     }
 
-    // Nombre completo para el token y la respuesta
     const nombreCompleto = [admin.nombre, admin.apellido1, admin.apellido2].filter(Boolean).join(' ').trim();
 
-    // Generación del token JWT firmado con la clave secreta
+    // Generacion del token JWT con vigencia de 30 dias para evitar expiracion en pruebas
     const token = jwt.sign(
       {
         id: admin.id,
@@ -52,7 +47,7 @@ export class AdminService {
         rol: 'ADMIN',
       },
       JWT_SECRET,
-      { expiresIn: '8h' }
+      { expiresIn: '30d' }
     );
 
     return {

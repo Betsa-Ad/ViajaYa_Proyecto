@@ -67,4 +67,16 @@ export class ReservaController {
       next(err);
     }
   };
+
+  // Consulta cupos disponibles para un destino en una fecha
+  consultarCupos = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { destinoId } = req.params;
+      const fecha = (req.query.fecha as string) || new Date().toISOString().split('T')[0];
+      const resultado = await this.service.consultarCuposDisponibles(destinoId, fecha);
+      res.status(200).json({ data: resultado });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

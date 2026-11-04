@@ -179,6 +179,29 @@ export class ReservaService {
     return this.reservaRepo.updateFecha(id, nuevaFecha);
   }
 
+  // Consulta cupos disponibles para un destino y fecha especifica (RN-01)
+  async consultarCuposDisponibles(
+    destinoId: string,
+    fechaViaje: string
+  ): Promise<{ capacidadTotal: number; ocupados: number; disponibles: number }> {
+    const destino = await this.destinoRepo.findById(destinoId);
+    if (!destino) {
+      throw new BusinessError('Destino no disponible', 'El destino no existe.', 404);
+    }
+
+    const ocupados = await this.reservaRepo.countPersonasByDestinoAndFecha(
+      destinoId,
+      fechaViaje
+    );
+    const disponibles = Math.max(0, destino.capacidadDiaria - ocupados);
+
+    return {
+      capacidadTotal: destino.capacidadDiaria,
+      ocupados,
+      disponibles,
+    };
+  }
+
   // Helpers privados 
 
   //! RN-02: Calcula la diferencia en horas entre ahora (UTC) y la fecha del viaje.

@@ -26,7 +26,10 @@ router.get('/codigo/:codigo', controller.obtenerPorCodigo);
 // Consultar reservas por correo del cliente
 router.get('/correo/:correo', controller.obtenerPorCorreo);
 
-//Consultar reserva por ID
+// Consultar cupos disponibles para un destino en una fecha (RN-01)
+router.get('/cupos/:destinoId', controller.consultarCupos);
+
+// Consultar reserva por ID
 router.get('/:id', controller.obtener);
 
 //! RN-02: Solo se permite cancelar/reprogramar con más de 48 horas de anticipación.

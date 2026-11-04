@@ -12,6 +12,9 @@ export interface Reserva {
   numPersonas: number;
   estado: EstadoReserva;
   codigoConfirmacion: string | null;
+  subtotal?: number;
+  iva?: number;
+  total?: number;
   createdAt: Date;
 }
 
