@@ -5,6 +5,9 @@ import {
   crearDestino,
   editarDestino,
   desactivarDestino,
+  cambiarEstadoReservaAdmin,
+  eliminarReservaAdmin,
+  actualizarPagoAdmin,
 } from '../services/api';
 import {
   formatearColones,
@@ -23,8 +26,8 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
     return guardado ? JSON.parse(guardado) : null;
   });
 
-  const [correoLogin, setCorreoLogin] = useState('betsadasa02@gmail.com');
-  const [passwordLogin, setPasswordLogin] = useState('12345');
+  const [correoLogin, setCorreoLogin] = useState('admin@gmail.com');
+  const [passwordLogin, setPasswordLogin] = useState('01010');
   const [cargandoLogin, setCargandoLogin] = useState(false);
   const [errorLogin, setErrorLogin] = useState('');
 
@@ -44,6 +47,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
 
   const [destinoEditando, setDestinoEditando] = useState(null);
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
+  const [modalConfirmacion, setModalConfirmacion] = useState(null);
 
   // Escucha evento global de expiracion de sesion 401 para volver al login limpiamente
   useEffect(() => {
@@ -51,6 +55,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
       setToken('');
       setAdminInfo(null);
       setDestinoEditando(null);
+      setModalConfirmacion(null);
       setErrorLogin('Tu sesión ha expirado o requiere autenticación. Por favor inicia sesión nuevamente.');
     };
     window.addEventListener('viajaya_sesion_expirada', handleSesionExpirada);
@@ -116,6 +121,70 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
       setAlerta({ tipo: 'error', mensaje: err.message || 'Error al cargar las reservas.' });
     } finally {
       setCargandoReservas(false);
+    }
+  };
+
+  // RF-08: Cambia el estado de una reserva (Aprobar / Cancelar)
+  const handleCambiarEstadoReserva = async (id, nuevoEstado) => {
+    try {
+      await cambiarEstadoReservaAdmin(id, nuevoEstado);
+      setReservas((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, estado: nuevoEstado } : r))
+      );
+      setAlerta({
+        tipo: 'exito',
+        mensaje: `Reserva #${id} actualizada a estado ${nuevoEstado} con éxito.`,
+      });
+    } catch (err) {
+      setAlerta({ tipo: 'error', mensaje: err.message || 'Error al actualizar estado de la reserva.' });
+    }
+  };
+
+  // Abre modal de confirmación propio para eliminar una reserva
+  const handleEliminarReserva = (id) => {
+    setModalConfirmacion({
+      tipo: 'eliminar_reserva',
+      titulo: 'Confirmar Eliminación',
+      mensaje: '¿Estás seguro de que deseas eliminar permanentemente esta reserva? Esta acción liberará los cupos asociados.',
+      textoBoton: 'Sí, Eliminar',
+      colorBoton: '#ef4444',
+      onConfirmar: () => ejecutarEliminarReserva(id),
+    });
+  };
+
+  // Ejecuta la eliminación permanente de la reserva tras confirmar en el modal
+  const ejecutarEliminarReserva = async (id) => {
+    setModalConfirmacion(null);
+    try {
+      await eliminarReservaAdmin(id);
+      setReservas((prev) => prev.filter((r) => r.id !== id));
+      setAlerta({ tipo: 'exito', mensaje: `Reserva #${id} eliminada permanentemente.` });
+    } catch (err) {
+      setAlerta({ tipo: 'error', mensaje: err.message || 'Error al eliminar la reserva.' });
+    }
+  };
+
+  // RF-09: Simula cobro manual y actualiza el estado de pago
+  const handleCambiarPago = async (id, nuevoEstadoPago) => {
+    try {
+      const actualizada = await actualizarPagoAdmin(id, nuevoEstadoPago);
+      setReservas((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? {
+                ...r,
+                estadoPago: nuevoEstadoPago,
+                estado: actualizada.estado || (nuevoEstadoPago === 'APROBADO' ? 'CONFIRMADA' : nuevoEstadoPago === 'RECHAZADO' ? 'RECHAZADA' : 'PENDIENTE'),
+              }
+            : r
+        )
+      );
+      setAlerta({
+        tipo: 'exito',
+        mensaje: `Cobro de reserva #${id} actualizado a ${nuevoEstadoPago}.`,
+      });
+    } catch (err) {
+      setAlerta({ tipo: 'error', mensaje: err.message || 'Error al actualizar el pago.' });
     }
   };
 
@@ -212,11 +281,21 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
     }
   };
 
-  // Desactivacion logica del destino
-  const handleDesactivarDestino = async (id, nombre) => {
-    const confirmar = window.confirm(`¿Está seguro de desactivar el destino "${nombre}"?`);
-    if (!confirmar) return;
+  // Abre modal de confirmación propio para desactivar un destino
+  const handleDesactivarDestino = (id, nombre) => {
+    setModalConfirmacion({
+      tipo: 'desactivar_destino',
+      titulo: 'Confirmar Desactivación',
+      mensaje: `¿Estás seguro de que deseas desactivar el destino "${nombre}"?`,
+      textoBoton: 'Sí, Desactivar',
+      colorBoton: '#f97316',
+      onConfirmar: () => ejecutarDesactivarDestino(id, nombre),
+    });
+  };
 
+  // Ejecuta la desactivación lógica del destino tras confirmar en el modal
+  const ejecutarDesactivarDestino = async (id, nombre) => {
+    setModalConfirmacion(null);
     try {
       await desactivarDestino(id);
       setListaDestinos((prev) =>
@@ -400,7 +479,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
             </form>
 
             <div style={{ marginTop: '20px', padding: '12px', background: 'var(--color-arena-claro)', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--color-texto-suave)', border: '1px solid var(--color-borde-suave)' }}>
-              Credenciales de prueba registradas: correo betsadasa02@gmail.com, contraseña 12345
+              Credenciales de prueba registradas: correo admin@gmail.com, contraseña 01010
             </div>
           </div>
         </div>
@@ -661,13 +740,15 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                     <th>Fecha Viaje</th>
                     <th>Personas</th>
                     <th>Total</th>
-                    <th>Estado</th>
+                    <th>Estado Reserva</th>
+                    <th>Estado de Pago</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {reservas.length === 0 ? (
                     <tr>
-                      <td colSpan="8" style={{ textAlign: 'center', padding: '24px', color: 'var(--color-texto-suave)' }}>
+                      <td colSpan="10" style={{ textAlign: 'center', padding: '24px', color: 'var(--color-texto-suave)' }}>
                         {cargandoReservas ? 'Cargando reservas...' : 'No se encontraron reservas registradas.'}
                       </td>
                     </tr>
@@ -688,6 +769,50 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                           <span className={`badge-estado badge-${r.estado?.toLowerCase()}`}>
                             {r.estado}
                           </span>
+                        </td>
+                        <td>
+                          <select
+                            value={r.estadoPago || (r.estado === 'CONFIRMADA' ? 'APROBADO' : r.estado === 'RECHAZADA' ? 'RECHAZADO' : 'PENDIENTE')}
+                            onChange={(e) => handleCambiarPago(r.id, e.target.value)}
+                            style={{ padding: '4px 6px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '0.85rem', cursor: 'pointer' }}
+                          >
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="APROBADO">Aprobado</option>
+                            <option value="RECHAZADO">Rechazado</option>
+                          </select>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-oceano"
+                              onClick={() => handleCambiarEstadoReserva(r.id, 'CONFIRMADA')}
+                              disabled={r.estado === 'CONFIRMADA'}
+                              title="Aprobar reserva"
+                              style={{ padding: '4px 8px', fontSize: '0.78rem' }}
+                            >
+                              Aprobar
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-secundario"
+                              onClick={() => handleCambiarEstadoReserva(r.id, 'CANCELADA')}
+                              disabled={r.estado === 'CANCELADA'}
+                              title="Cancelar reserva"
+                              style={{ padding: '4px 8px', fontSize: '0.78rem' }}
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm"
+                              onClick={() => handleEliminarReserva(r.id)}
+                              title="Eliminar reserva"
+                              style={{ padding: '4px 8px', fontSize: '0.78rem', background: '#ef4444', color: '#fff', border: 'none' }}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -822,6 +947,40 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal propio de confirmación para eliminar o desactivar */}
+        {modalConfirmacion && (
+          <div className="modal-overlay" onClick={() => setModalConfirmacion(null)}>
+            <div className="modal-caja" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+              <div className="modal-header">
+                <h3>{modalConfirmacion.titulo}</h3>
+                <button className="modal-cerrar" onClick={() => setModalConfirmacion(null)}>✕</button>
+              </div>
+              <div className="modal-body" style={{ padding: '16px 0 8px' }}>
+                <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '22px' }}>
+                  {modalConfirmacion.mensaje}
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secundario"
+                    onClick={() => setModalConfirmacion(null)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    style={{ background: modalConfirmacion.colorBoton || '#ef4444', color: '#fff', border: 'none' }}
+                    onClick={modalConfirmacion.onConfirmar}
+                  >
+                    {modalConfirmacion.textoBoton}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

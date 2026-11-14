@@ -28,6 +28,41 @@ class AdminController {
                 next(err);
             }
         };
+        //* RF-08: Cambia el estado de una reserva (CONFIRMADA / CANCELADA) — PATCH /api/admin/reservas/:id/estado
+        this.cambiarEstadoReserva = async (req, res, next) => {
+            try {
+                const { id } = req.params;
+                const { estado } = req.body;
+                const reserva = await this.reservaService.cambiarEstadoAdmin(id, estado);
+                res.status(200).json({ data: reserva });
+            }
+            catch (err) {
+                next(err);
+            }
+        };
+        //* RF-08: Elimina una reserva de la base de datos — DELETE /api/admin/reservas/:id
+        this.eliminarReserva = async (req, res, next) => {
+            try {
+                const { id } = req.params;
+                await this.reservaService.eliminarReservaAdmin(id);
+                res.status(200).json({ mensaje: 'Reserva eliminada con éxito' });
+            }
+            catch (err) {
+                next(err);
+            }
+        };
+        //* RF-09: Simulación de cobro manual de reserva — PATCH /api/admin/reservas/:id/pago
+        this.actualizarPago = async (req, res, next) => {
+            try {
+                const { id } = req.params;
+                const { estadoPago } = req.body;
+                const reserva = await this.reservaService.actualizarPagoAdmin(id, estadoPago);
+                res.status(200).json({ data: reserva });
+            }
+            catch (err) {
+                next(err);
+            }
+        };
     }
 }
 exports.AdminController = AdminController;

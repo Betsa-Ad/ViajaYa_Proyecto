@@ -44,16 +44,13 @@ class ReservaService {
             throw new BusinessError('Datos de pago inválidos', 'Los dígitos de la tarjeta deben ser numéricos.', 400);
         }
         const esPar = ultimoDigito % 2 === 0;
-        //! RN-04: Dígito IMPAR → pago rechazado, se devuelve HTTP 422.
-        if (!esPar) {
-            throw new BusinessError('Pago rechazado', 'La transacción fue rechazada por el gateway de pago. Verifique los datos de su tarjeta.', 422);
-        }
-        //! RN-04: Dígito PAR → pago aprobado, genera código único 'VY-XXXX-XX'.
+        //! RF-03 / RN-04: Par genera CONFIRMADA, impar genera RECHAZADA sin abortar ni bloquear guardado
         const codigoConfirmacion = this.generarCodigoConfirmacion();
+        const estadoReserva = esPar ? 'CONFIRMADA' : 'RECHAZADA';
         try {
             return await this.reservaRepo.create({
                 ...data,
-                estado: 'CONFIRMADA',
+                estado: estadoReserva,
                 codigoConfirmacion,
             });
         }
@@ -72,8 +69,8 @@ class ReservaService {
         }
         return reserva;
     }
-    //* Obtiene una reserva por su código de confirmación.
-    async obtenerPorCodigo(codigo) {
+    //* RF-04: Obtiene una reserva por su código de confirmación y valida opcionalmente el correo coincidente.
+    async obtenerPorCodigo(codigo, correo) {
         if (!this.reservaRepo.findByCodigo) {
             throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por código.', 500);
         }
@@ -81,7 +78,31 @@ class ReservaService {
         if (!reserva) {
             throw new BusinessError('Reserva no encontrada', `No existe una reserva con el código ${codigo}.`, 404);
         }
+        if (correo && reserva.clienteEmail.toLowerCase() !== correo.trim().toLowerCase()) {
+            throw new BusinessError('Acceso denegado', 'El correo no coincide con la reserva.', 403);
+        }
         return reserva;
+    }
+    // RF-08: Cambia el estado de una reserva desde la administración (CONFIRMADA / CANCELADA)
+    async cambiarEstadoAdmin(id, nuevoEstado) {
+        await this.obtenerReserva(id);
+        return this.reservaRepo.updateEstado(id, nuevoEstado);
+    }
+    // RF-08: Elimina una reserva de la base de datos
+    async eliminarReservaAdmin(id) {
+        await this.obtenerReserva(id);
+        if (!this.reservaRepo.delete) {
+            throw new BusinessError('Operación no soportada', 'El repositorio no soporta eliminación.', 500);
+        }
+        return this.reservaRepo.delete(id);
+    }
+    // RF-09: Actualiza el estado del pago simulado y sincroniza la reserva
+    async actualizarPagoAdmin(id, estadoPago) {
+        await this.obtenerReserva(id);
+        if (!this.reservaRepo.updateEstadoPago) {
+            throw new BusinessError('Operación no soportada', 'El repositorio no soporta actualización de pago.', 500);
+        }
+        return this.reservaRepo.updateEstadoPago(id, estadoPago);
     }
     //* Obtiene las reservas asociadas al correo de un cliente.
     async obtenerPorCorreo(correo) {
@@ -123,6 +144,20 @@ class ReservaService {
             throw new BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para la nueva fecha.`, 409);
         }
         return this.reservaRepo.updateFecha(id, nuevaFecha);
+    }
+    // Consulta cupos disponibles para un destino y fecha especifica (RN-01)
+    async consultarCuposDisponibles(destinoId, fechaViaje) {
+        const destino = await this.destinoRepo.findById(destinoId);
+        if (!destino) {
+            throw new BusinessError('Destino no disponible', 'El destino no existe.', 404);
+        }
+        const ocupados = await this.reservaRepo.countPersonasByDestinoAndFecha(destinoId, fechaViaje);
+        const disponibles = Math.max(0, destino.capacidadDiaria - ocupados);
+        return {
+            capacidadTotal: destino.capacidadDiaria,
+            ocupados,
+            disponibles,
+        };
     }
     // Helpers privados 
     //! RN-02: Calcula la diferencia en horas entre ahora (UTC) y la fecha del viaje.

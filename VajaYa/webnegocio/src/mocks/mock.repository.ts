@@ -98,14 +98,14 @@ export class MockReservaRepository implements IReservaRepository {
     return this.reservas.find((r) => r.id === id) ?? null;
   }
 
-  //! RN-01: Suma las personas ya reservadas para ese destino y fecha (para validar cupo).
+  //! RN-01: Suma las personas con reserva CONFIRMADA para ese destino y fecha (para validar cupo).
   async countPersonasByDestinoAndFecha(destinoId: string, fecha: string): Promise<number> {
     return this.reservas
       .filter(
         (r) =>
           r.destinoId === destinoId &&
           r.fechaViaje === fecha &&
-          r.estado !== 'CANCELADA'
+          r.estado === 'CONFIRMADA'
       )
       .reduce((sum, r) => sum + r.numPersonas, 0);
   }
@@ -123,6 +123,7 @@ export class MockReservaRepository implements IReservaRepository {
       numPersonas: data.numPersonas,
       estado: data.estado,
       codigoConfirmacion: data.codigoConfirmacion,
+      estadoPago: data.estado === 'CONFIRMADA' ? 'APROBADO' : 'RECHAZADO',
       createdAt: new Date(),
     };
     this.reservas.push(nueva);
@@ -142,6 +143,25 @@ export class MockReservaRepository implements IReservaRepository {
     const index = this.reservas.findIndex((r) => r.id === id);
     if (index === -1) throw new Error('Reserva no encontrada');
     this.reservas[index].fechaViaje = nuevaFecha;
+    return this.reservas[index];
+  }
+
+  //* RF-08: Elimina una reserva de la memoria.
+  async delete(id: string): Promise<boolean> {
+    const index = this.reservas.findIndex((r) => r.id === id);
+    if (index === -1) return false;
+    this.reservas.splice(index, 1);
+    return true;
+  }
+
+  //* RF-09: Actualiza el estado del pago simulado y sincroniza el estado de la reserva.
+  async updateEstadoPago(idReserva: string, estadoPago: string): Promise<Reserva> {
+    const index = this.reservas.findIndex((r) => r.id === idReserva);
+    if (index === -1) throw new Error('Reserva no encontrada');
+    this.reservas[index].estadoPago = estadoPago;
+    if (estadoPago === 'APROBADO') this.reservas[index].estado = 'CONFIRMADA';
+    if (estadoPago === 'RECHAZADO') this.reservas[index].estado = 'RECHAZADA';
+    if (estadoPago === 'PENDIENTE') this.reservas[index].estado = 'PENDIENTE';
     return this.reservas[index];
   }
 

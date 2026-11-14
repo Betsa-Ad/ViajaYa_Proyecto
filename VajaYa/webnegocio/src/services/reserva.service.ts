@@ -5,6 +5,7 @@ import { IDestinoRepository } from '../interfaces/IDestinoRepository';
 import {
   IReservaRepository,
   Reserva,
+  EstadoReserva,
   CreateReservaDto,
   ReservaAuditoria,
 } from '../interfaces/IReservaRepository';
@@ -73,22 +74,14 @@ export class ReservaService {
 
     const esPar = ultimoDigito % 2 === 0;
 
-    //! RN-04: Dígito IMPAR → pago rechazado, se devuelve HTTP 422.
-    if (!esPar) {
-      throw new BusinessError(
-        'Pago rechazado',
-        'La transacción fue rechazada por el gateway de pago. Verifique los datos de su tarjeta.',
-        422
-      );
-    }
-
-    //! RN-04: Dígito PAR → pago aprobado, genera código único 'VY-XXXX-XX'.
+    //! RF-03 / RN-04: Par genera CONFIRMADA, impar genera RECHAZADA sin abortar ni bloquear guardado
     const codigoConfirmacion = this.generarCodigoConfirmacion();
+    const estadoReserva: EstadoReserva = esPar ? 'CONFIRMADA' : 'RECHAZADA';
 
     try {
       return await this.reservaRepo.create({
         ...data,
-        estado: 'CONFIRMADA',
+        estado: estadoReserva,
         codigoConfirmacion,
       });
     } catch (err: any) {
@@ -108,8 +101,8 @@ export class ReservaService {
     return reserva;
   }
 
-  //* Obtiene una reserva por su código de confirmación.
-  async obtenerPorCodigo(codigo: string): Promise<Reserva> {
+  //* RF-04: Obtiene una reserva por su código de confirmación y valida opcionalmente el correo coincidente.
+  async obtenerPorCodigo(codigo: string, correo?: string): Promise<Reserva> {
     if (!this.reservaRepo.findByCodigo) {
       throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por código.', 500);
     }
@@ -117,7 +110,34 @@ export class ReservaService {
     if (!reserva) {
       throw new BusinessError('Reserva no encontrada', `No existe una reserva con el código ${codigo}.`, 404);
     }
+    if (correo && reserva.clienteEmail.toLowerCase() !== correo.trim().toLowerCase()) {
+      throw new BusinessError('Acceso denegado', 'El correo no coincide con la reserva.', 403);
+    }
     return reserva;
+  }
+
+  // RF-08: Cambia el estado de una reserva desde la administración (CONFIRMADA / CANCELADA)
+  async cambiarEstadoAdmin(id: string, nuevoEstado: EstadoReserva): Promise<Reserva> {
+    await this.obtenerReserva(id);
+    return this.reservaRepo.updateEstado(id, nuevoEstado);
+  }
+
+  // RF-08: Elimina una reserva de la base de datos
+  async eliminarReservaAdmin(id: string): Promise<boolean> {
+    await this.obtenerReserva(id);
+    if (!this.reservaRepo.delete) {
+      throw new BusinessError('Operación no soportada', 'El repositorio no soporta eliminación.', 500);
+    }
+    return this.reservaRepo.delete(id);
+  }
+
+  // RF-09: Actualiza el estado del pago simulado y sincroniza la reserva
+  async actualizarPagoAdmin(id: string, estadoPago: string): Promise<Reserva> {
+    await this.obtenerReserva(id);
+    if (!this.reservaRepo.updateEstadoPago) {
+      throw new BusinessError('Operación no soportada', 'El repositorio no soporta actualización de pago.', 500);
+    }
+    return this.reservaRepo.updateEstadoPago(id, estadoPago);
   }
 
   //* Obtiene las reservas asociadas al correo de un cliente.

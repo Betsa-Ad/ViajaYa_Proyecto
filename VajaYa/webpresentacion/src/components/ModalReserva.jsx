@@ -101,8 +101,10 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
         ultimosDigitosTarjeta: digitosLimpios,
       });
 
-      // Descuenta de inmediato los cupos en la pantalla para reflejar la disponibilidad actualizada
-      setCuposDisponibles((prev) => Math.max(0, prev - personasNumerico));
+      // Descuenta de inmediato los cupos en la pantalla solo si fue confirmada (RN-01)
+      if (respuesta.estado !== 'RECHAZADA') {
+        setCuposDisponibles((prev) => Math.max(0, prev - personasNumerico));
+      }
 
       setReservaCreada(respuesta);
       if (onReservaExitosa) onReservaExitosa(respuesta);
@@ -157,13 +159,27 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
               </div>
 
               <div className="no-print" style={{ textAlign: 'center', marginBottom: '16px' }}>
-                <div className="reserva-exito-icono">✓</div>
-                <h3 style={{ color: 'var(--color-azul-oceano)', marginBottom: '4px' }}>
-                  ¡Pago y Reserva Aprobados!
-                </h3>
-                <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.92rem' }}>
-                  Tu viaje a <strong>{destino.nombre}</strong> ha sido confirmado con éxito.
-                </p>
+                {reservaCreada.estado === 'RECHAZADA' ? (
+                  <>
+                    <div className="reserva-exito-icono" style={{ background: '#fee2e2', color: '#dc2626' }}>✕</div>
+                    <h3 style={{ color: '#dc2626', marginBottom: '4px' }}>
+                      Pago Rechazado por la Pasarela
+                    </h3>
+                    <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.92rem' }}>
+                      La tarjeta ingresada fue rechazada. La reserva fue registrada con estado <strong>RECHAZADA</strong> para trazabilidad histórica.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="reserva-exito-icono">✓</div>
+                    <h3 style={{ color: 'var(--color-azul-oceano)', marginBottom: '4px' }}>
+                      ¡Pago y Reserva Aprobados!
+                    </h3>
+                    <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.92rem' }}>
+                      Tu viaje a <strong>{destino.nombre}</strong> ha sido confirmado con éxito.
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Codigo oficial de confirmacion */}
@@ -197,7 +213,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
                 <div className="comprobante-dato-fila">
                   <span className="comprobante-dato-etiqueta">Estado de la Reserva:</span>
                   <span className="comprobante-dato-valor">
-                    <span className="badge-estado badge-confirmada">{reservaCreada.estado || 'CONFIRMADA'}</span>
+                    <span className={`badge-estado badge-${reservaCreada.estado?.toLowerCase() || 'confirmada'}`}>{reservaCreada.estado || 'CONFIRMADA'}</span>
                   </span>
                 </div>
               </div>

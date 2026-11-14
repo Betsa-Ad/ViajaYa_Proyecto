@@ -1,7 +1,7 @@
 
 // Contrato que webdatos debe implementar para reservas.
 
-export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
+export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'RECHAZADA';
 
 export interface Reserva {
   id: string;
@@ -12,6 +12,7 @@ export interface Reserva {
   numPersonas: number;
   estado: EstadoReserva;
   codigoConfirmacion: string | null;
+  estadoPago?: string;
   subtotal?: number;
   iva?: number;
   total?: number;
@@ -21,6 +22,7 @@ export interface Reserva {
 // Detalle ampliado de la reserva para monitoreo y auditoría administrativa (CAR-06)
 export interface ReservaAuditoria extends Reserva {
   destinoNombre?: string;
+  estadoPago?: string;
   subtotal?: number;
   iva?: number;
   total?: number;
@@ -45,4 +47,6 @@ export interface IReservaRepository {
   findByCodigo?(codigo: string): Promise<Reserva | null>;
   findByCorreo?(correo: string): Promise<Reserva[]>;
   findAll?(): Promise<ReservaAuditoria[]>;
+  delete?(id: string): Promise<boolean>;
+  updateEstadoPago?(idReserva: string, estadoPago: string): Promise<Reserva>;
 }

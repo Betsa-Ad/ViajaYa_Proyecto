@@ -67,7 +67,7 @@ export class ReservaRepository implements IReservaRepository {
     return mapReserva(result.rows[0]);
   }
 
-  // RN-01: Cuenta las personas ya reservadas para un destino en una fecha (excluyendo canceladas)
+  // RN-01: Cuenta las personas ya reservadas para un destino en una fecha (solo reservas confirmadas)
   async countPersonasByDestinoAndFecha(destinoId: string, fecha: string): Promise<number> {
     const idNum = Number(destinoId);
     if (isNaN(idNum)) return 0;
@@ -75,7 +75,7 @@ export class ReservaRepository implements IReservaRepository {
     const query = `
       SELECT COALESCE(SUM(cantidad_personas), 0)::integer AS total
       FROM reserva
-      WHERE id_destino = $1 AND fecha_viaje = $2 AND estado != 'CANCELADA'
+      WHERE id_destino = $1 AND fecha_viaje = $2 AND estado = 'CONFIRMADA'
     `;
     const result = await pool.query(query, [idNum, fecha]);
     return Number(result.rows[0].total);
@@ -123,11 +123,11 @@ export class ReservaRepository implements IReservaRepository {
       }
       const destino = destinoRes.rows[0];
 
-      // Cuenta los cupos ocupados de forma consistente dentro de la transacción
+      // Cuenta los cupos ocupados de forma consistente dentro de la transacción (solo confirmadas)
       const countRes = await client.query(
         `SELECT COALESCE(SUM(cantidad_personas), 0)::integer AS ocupadas
          FROM reserva
-         WHERE id_destino = $1 AND fecha_viaje = $2 AND estado != 'CANCELADA'`,
+         WHERE id_destino = $1 AND fecha_viaje = $2 AND estado = 'CONFIRMADA'`,
         [idDestino, data.fechaViaje]
       );
       const personasOcupadas = Number(countRes.rows[0].ocupadas);
@@ -189,7 +189,8 @@ export class ReservaRepository implements IReservaRepository {
       // Inserta el registro de pago usando el helper (ultimo_digito_tarjeta es VARCHAR(1))
       const refPago = `REF-${data.codigoConfirmacion ?? idReserva}`;
       const ultimoDigito = data.ultimosDigitosTarjeta ? data.ultimosDigitosTarjeta.slice(-1) : '0';
-      await this.insertarPago(idReserva, refPago, ultimoDigito, 'APROBADO', client);
+      const estadoPago = data.estado === 'CONFIRMADA' ? 'APROBADO' : 'RECHAZADO';
+      await this.insertarPago(idReserva, refPago, ultimoDigito, estadoPago, client);
 
       // Confirma la transacción en la base de datos
       await client.query('COMMIT');
@@ -264,6 +265,7 @@ export class ReservaRepository implements IReservaRepository {
         r.iva,
         r.total,
         r.estado,
+        p.estado_pago,
         c.nombre AS cliente_nombre,
         c.apellido1 AS cliente_apellido1,
         c.apellido2 AS cliente_apellido2,
@@ -271,6 +273,7 @@ export class ReservaRepository implements IReservaRepository {
       FROM reserva r
       JOIN cliente c ON r.id_cliente = c.id_cliente
       LEFT JOIN destino d ON r.id_destino = d.id_destino
+      LEFT JOIN pago p ON r.id_reserva = p.id_reserva
       ORDER BY r.id_reserva DESC
     `;
     const result = await pool.query(query);
@@ -288,8 +291,46 @@ export class ReservaRepository implements IReservaRepository {
       iva: row.iva != null ? Number(row.iva) : undefined,
       total: row.total != null ? Number(row.total) : undefined,
       estado: row.estado as EstadoReserva,
+      estadoPago: row.estado_pago || 'PENDIENTE',
       codigoConfirmacion: row.codigo_confirmacion,
       createdAt: row.created_at ? new Date(row.created_at) : new Date(),
     }));
+  }
+
+  // RF-08: Elimina una reserva de la base de datos y su pago asociado
+  async delete(id: string): Promise<boolean> {
+    const idNum = Number(id);
+    if (isNaN(idNum)) return false;
+
+    await pool.query('DELETE FROM pago WHERE id_reserva = $1', [idNum]);
+    const result = await pool.query('DELETE FROM reserva WHERE id_reserva = $1', [idNum]);
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // RF-09: Actualiza el estado del pago simulado y sincroniza el estado de la reserva
+  async updateEstadoPago(idReserva: string, estadoPago: string): Promise<Reserva> {
+    const idNum = Number(idReserva);
+    if (isNaN(idNum)) throw new Error('ID de reserva inválido');
+
+    const pagoRes = await pool.query(
+      'UPDATE pago SET estado_pago = $1 WHERE id_reserva = $2 RETURNING id_pago',
+      [estadoPago, idNum]
+    );
+    if (pagoRes.rows.length === 0) {
+      await pool.query(
+        'INSERT INTO pago (id_reserva, referencia_transaccion, ultimo_digito_tarjeta, estado_pago) VALUES ($1, $2, $3, $4)',
+        [idNum, `REF-${idNum}`, '0', estadoPago]
+      );
+    }
+
+    let nuevoEstado: EstadoReserva = 'PENDIENTE';
+    if (estadoPago === 'APROBADO') nuevoEstado = 'CONFIRMADA';
+    if (estadoPago === 'RECHAZADO') nuevoEstado = 'RECHAZADA';
+
+    await pool.query('UPDATE reserva SET estado = $1 WHERE id_reserva = $2', [nuevoEstado, idNum]);
+
+    const reserva = await this.findById(idReserva);
+    if (!reserva) throw new Error('Reserva no encontrada');
+    return reserva;
   }
 }

@@ -156,3 +156,32 @@ export async function desactivarDestino(id, token) {
   });
   return res.data;
 }
+
+// RF-08: Cambiar estado de una reserva desde la administración (Aprobar / Cancelar)
+export async function cambiarEstadoReservaAdmin(id, estado, token) {
+  const res = await request(`/admin/reservas/${id}/estado`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify({ estado }),
+  });
+  return res.data;
+}
+
+// RF-08: Eliminar una reserva de la base de datos
+export async function eliminarReservaAdmin(id, token) {
+  const res = await request(`/admin/reservas/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(token),
+  });
+  return res;
+}
+
+// RF-09: Actualizar el estado de cobro simulado manualmente
+export async function actualizarPagoAdmin(id, estadoPago, token) {
+  const res = await request(`/admin/reservas/${id}/pago`, {
+    method: 'PATCH',
+    headers: getAuthHeaders(token),
+    body: JSON.stringify({ estadoPago }),
+  });
+  return res.data;
+}

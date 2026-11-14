@@ -1,5 +1,5 @@
 
--- Script DDL Oficial - Sistema ViajaYa (PostgreSQL / Supabase)
+-- Script DDL  - Sistema ViajaYa (PostgreSQL / Supabase)
 -- Define las 5 tablas del Modelo Entidad-Relación (DER)
 
 
@@ -82,9 +82,11 @@ CREATE TABLE pago (
 
 
 -- DATOS INICIALES DE PRUEBA
--- Administrador oficial de prueba (para autenticación JWT)
+-- Administradores oficiales de prueba (para autenticación JWT)
 INSERT INTO administrador (nombre, apellido1, apellido2, correo, contrasena_hash, estado)
-VALUES ('Betsabe', 'Camaño', 'Godinez', 'betsadasa02@gmail.com', '12345', 'ACTIVO');
+VALUES 
+    ('Administrador', 'General', 'ViajaYa', 'admin@gmail.com', '01010', 'ACTIVO'),
+    ('Betsabe', 'Camaño', 'Godinez', 'betsadasa02@gmail.com', '12345', 'ACTIVO');
 
 -- Destinos turísticos iniciales
 INSERT INTO destino (nombre, descripcion, precio_base_persona, capacidad_maxima, estado)

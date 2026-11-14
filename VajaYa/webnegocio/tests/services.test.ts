@@ -176,14 +176,13 @@ describe('RN-04: Gateway de Pago por Paridad', () => {
     expect(reserva.codigoConfirmacion).toMatch(/^VY-\d{4}-\d{2}$/);
   });
 
-  test('tarjeta con ultimo dígito impar, pago rechazado con HTTP 422', async () => {
+  test('tarjeta con ultimo dígito impar, pago rechazado y guardado con estado RECHAZADA', async () => {
     // ultimo digito impar
-    await expect(
-      service.crearReserva(buildReservaPayload({ ultimosDigitosTarjeta: '1233' }))
-    ).rejects.toMatchObject({
-      title: 'Pago rechazado',
-      statusCode: 422,
-    });
+    const reserva = await service.crearReserva(
+      buildReservaPayload({ ultimosDigitosTarjeta: '1233' })
+    );
+    expect(reserva.estado).toBe('RECHAZADA');
+    expect(reserva.codigoConfirmacion).toMatch(/^VY-\d{4}-\d{2}$/);
   });
 
   test('ultimos dígitos terminados en 0, aprobado', async () => {
@@ -194,11 +193,12 @@ describe('RN-04: Gateway de Pago por Paridad', () => {
     expect(reserva.estado).toBe('CONFIRMADA');
   });
 
-  test('ultimos dígitos terminados en 9, rechazado con HTTP 422', async () => {
+  test('ultimos dígitos terminados en 9, rechazado y guardado con estado RECHAZADA', async () => {
     // ultimo digito impar
-    await expect(
-      service.crearReserva(buildReservaPayload({ ultimosDigitosTarjeta: '1239' }))
-    ).rejects.toMatchObject({ statusCode: 422 });
+    const reserva = await service.crearReserva(
+      buildReservaPayload({ ultimosDigitosTarjeta: '1239' })
+    );
+    expect(reserva.estado).toBe('RECHAZADA');
   });
 
   test('código de confirmación sigue el formato VY-XXXX-XX', async () => {

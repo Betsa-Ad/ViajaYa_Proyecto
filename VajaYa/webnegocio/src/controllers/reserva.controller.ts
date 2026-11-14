@@ -30,7 +30,8 @@ export class ReservaController {
   //* Consulta una reserva por código — GET /api/reservas/codigo/:codigo
   obtenerPorCodigo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const reserva = await this.service.obtenerPorCodigo(req.params.codigo);
+      const correo = req.query.correo as string | undefined;
+      const reserva = await this.service.obtenerPorCodigo(req.params.codigo, correo);
       res.status(200).json({ data: reserva });
     } catch (err) {
       next(err);

@@ -13,6 +13,7 @@ export default function MisReservasView() {
   const [reserva, setReserva] = useState(null);
 
   const [mostrandoModalReprogramar, setMostrandoModalReprogramar] = useState(false);
+  const [mostrandoModalCancelar, setMostrandoModalCancelar] = useState(false);
   const [nuevaFecha, setNuevaFecha] = useState('');
   const [cargandoAccion, setCargandoAccion] = useState(false);
 
@@ -59,15 +60,9 @@ export default function MisReservasView() {
   const horasRestantes = reserva ? calcularHorasRestantes(reserva.fechaViaje) : 0;
   const permiteModificaciones = horasRestantes > 48 && reserva?.estado !== 'CANCELADA';
 
-  // Cancelacion respetando la ventana de 48 horas
-  const handleCancelar = async () => {
-    if (!permiteModificaciones) return;
-
-    const confirmar = window.confirm(
-      '¿Está seguro de que desea cancelar esta reserva? Esta acción no se puede deshacer.'
-    );
-    if (!confirmar) return;
-
+  // Cancelacion respetando la ventana de 48 horas mediante modal propio
+  const handleConfirmarCancelar = async () => {
+    setMostrandoModalCancelar(false);
     setCargandoAccion(true);
     setError('');
     setMensajeExito('');
@@ -301,12 +296,46 @@ export default function MisReservasView() {
               <button
                 type="button"
                 className="btn btn-peligro btn-sm"
-                onClick={handleCancelar}
+                onClick={() => setMostrandoModalCancelar(true)}
                 disabled={!permiteModificaciones || cargandoAccion}
                 title={!permiteModificaciones ? 'Bloqueado por la regla de 48 horas' : 'Cancelar reserva'}
               >
                 Cancelar Reserva
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal de confirmación propio para cancelar reserva */}
+        {mostrandoModalCancelar && (
+          <div className="modal-overlay" onClick={() => setMostrandoModalCancelar(false)}>
+            <div className="modal-caja" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
+              <div className="modal-header">
+                <h3>Confirmar Cancelación</h3>
+                <button className="modal-cerrar" onClick={() => setMostrandoModalCancelar(false)}>✕</button>
+              </div>
+              <div className="modal-body" style={{ padding: '16px 0 8px' }}>
+                <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.95rem', lineHeight: '1.5', marginBottom: '22px' }}>
+                  ¿Está seguro de que desea cancelar esta reserva? Esta acción no se puede deshacer y liberará los cupos asociados.
+                </p>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secundario"
+                    onClick={() => setMostrandoModalCancelar(false)}
+                  >
+                    Volver
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-peligro"
+                    onClick={handleConfirmarCancelar}
+                    disabled={cargandoAccion}
+                  >
+                    {cargandoAccion ? 'Cancelando...' : 'Sí, Cancelar Reserva'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

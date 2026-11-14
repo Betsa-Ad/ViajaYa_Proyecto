@@ -26,7 +26,16 @@ const router = Router();
 // Login de administrador (devuelve token JWT)
 router.post('/login', controller.login);
 
-//listar todas las reservas para monitoreo y auditoría (Protegido con JWT - CAR-06)
+// Listar todas las reservas para monitoreo y auditoría (Protegido con JWT - CAR-06)
 router.get('/reservas', authMiddleware, controller.listarReservas);
+
+// RF-08: Cambiar estado de una reserva (Protegido con JWT)
+router.patch('/reservas/:id/estado', authMiddleware, controller.cambiarEstadoReserva);
+
+// RF-08: Eliminar reserva de la base de datos (Protegido con JWT)
+router.delete('/reservas/:id', authMiddleware, controller.eliminarReserva);
+
+// RF-09: Cobro manual y cambio de estado de pago (Protegido con JWT)
+router.patch('/reservas/:id/pago', authMiddleware, controller.actualizarPago);
 
 export default router;

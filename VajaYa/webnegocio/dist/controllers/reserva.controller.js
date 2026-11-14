@@ -28,7 +28,8 @@ class ReservaController {
         //* Consulta una reserva por código — GET /api/reservas/codigo/:codigo
         this.obtenerPorCodigo = async (req, res, next) => {
             try {
-                const reserva = await this.service.obtenerPorCodigo(req.params.codigo);
+                const correo = req.query.correo;
+                const reserva = await this.service.obtenerPorCodigo(req.params.codigo, correo);
                 res.status(200).json({ data: reserva });
             }
             catch (err) {
@@ -61,6 +62,18 @@ class ReservaController {
                 const { nuevaFecha } = req.body;
                 const reserva = await this.service.reprogramarReserva(req.params.id, nuevaFecha);
                 res.status(200).json({ data: reserva });
+            }
+            catch (err) {
+                next(err);
+            }
+        };
+        // Consulta cupos disponibles para un destino en una fecha
+        this.consultarCupos = async (req, res, next) => {
+            try {
+                const { destinoId } = req.params;
+                const fecha = req.query.fecha || new Date().toISOString().split('T')[0];
+                const resultado = await this.service.consultarCuposDisponibles(destinoId, fecha);
+                res.status(200).json({ data: resultado });
             }
             catch (err) {
                 next(err);
