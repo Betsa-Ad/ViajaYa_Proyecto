@@ -51,6 +51,24 @@ describe('RN-01: Control de Cupos', () => {
     expect(reserva.codigoConfirmacion).toMatch(/^VY-\d{4}-\d{2}$/);
   });
 
+  test('debe rechazar una reserva si el número de personas no es un entero mayor o igual a 1', async () => {
+    await expect(
+      service.crearReserva(buildReservaPayload({ numPersonas: 0 }))
+    ).rejects.toMatchObject({ title: 'Cantidad de personas inválida', statusCode: 400 });
+
+    await expect(
+      service.crearReserva(buildReservaPayload({ numPersonas: -2 }))
+    ).rejects.toMatchObject({ title: 'Cantidad de personas inválida', statusCode: 400 });
+
+    await expect(
+      service.crearReserva(buildReservaPayload({ numPersonas: 1.5 }))
+    ).rejects.toMatchObject({ title: 'Cantidad de personas inválida', statusCode: 400 });
+
+    await expect(
+      service.crearReserva(buildReservaPayload({ numPersonas: 'tres' as any }))
+    ).rejects.toMatchObject({ title: 'Cantidad de personas inválida', statusCode: 400 });
+  });
+
   test('debe rechazar una reserva que excede la capacidad diaria', async () => {
     // dest-001 tiene capacidadDiaria = 10; intentamos reservar 11 personas
     await expect(
@@ -150,8 +168,10 @@ describe('RN-03: Fórmula de Tarifa', () => {
   });
 
   test('debe lanzar error si el número de personas es cero o no entero', () => {
-    expect(() => service.calcular({ precioBase: 100, numPersonas: 0 })).toThrow();
-    expect(() => service.calcular({ precioBase: 100, numPersonas: 1.5 })).toThrow();
+    expect(() => service.calcular({ precioBase: 100, numPersonas: 0 })).toThrow(BusinessError);
+    expect(() => service.calcular({ precioBase: 100, numPersonas: -1 })).toThrow(BusinessError);
+    expect(() => service.calcular({ precioBase: 100, numPersonas: 1.5 })).toThrow(BusinessError);
+    expect(() => service.calcular({ precioBase: 100, numPersonas: 'invalido' as any })).toThrow(BusinessError);
   });
 });
 

@@ -91,6 +91,24 @@ describe('Suite de Pruebas Unitarias RF-01 a RF-06 (Clientes y Reservas)', () =>
   });
 
   // RF-03: Crear reserva exitosa con tarjeta par (estado CONFIRMADA y código VY-XXXX-XX)
+  test('RF-03: debe rechazar la creación de reserva si el número de personas es menor a 1 o inválido', async () => {
+    // Arrange: datos con numPersonas inválido (cero)
+    const reservaInvalida = {
+      destinoId: 'dest-001',
+      clienteNombre: 'Laura Vega',
+      clienteEmail: 'laura@test.com',
+      fechaViaje: generarFechaFutura(4),
+      numPersonas: 0,
+      ultimosDigitosTarjeta: '4586',
+    };
+
+    // Act & Assert: debe lanzar error de validación 400
+    await expect(reservaService.crearReserva(reservaInvalida)).rejects.toMatchObject({
+      title: 'Cantidad de personas inválida',
+      statusCode: 400,
+    });
+  });
+
   test('RF-03: debe confirmar reserva y generar código VY-XXXX-XX cuando el último dígito de tarjeta es par', async () => {
     // Arrange: prepara datos de reserva con tarjeta terminada en dígito par (6)
     const datosReserva = {

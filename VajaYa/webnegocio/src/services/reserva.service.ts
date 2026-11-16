@@ -10,19 +10,9 @@ import {
   ReservaAuditoria,
 } from '../interfaces/IReservaRepository';
 import { CotizacionService } from './cotizacion.service';
+import { BusinessError, validarCantidadPersonas } from './validaciones';
 
-// Errores de negocio tipados 
-
-export class BusinessError extends Error {
-  constructor(
-    public readonly title: string,
-    message: string,
-    public readonly statusCode: number = 400
-  ) {
-    super(message);
-    this.name = 'BusinessError';
-  }
-}
+export { BusinessError, validarCantidadPersonas };
 
 // Servicio 
 
@@ -36,6 +26,9 @@ export class ReservaService {
 
   //* Crea una reserva aplicando RN-01 (cupos), RN-03 (tarifa) y RN-04 (pago simulado).
   async crearReserva(data: CreateReservaDto): Promise<Reserva> {
+    //! Valida que la cantidad de personas sea un entero estricto mayor o igual a 1.
+    validarCantidadPersonas(data.numPersonas);
+
     // Verificar que el destino existe y está activo
     const destino = await this.destinoRepo.findById(data.destinoId);
     if (!destino || !destino.activo) {

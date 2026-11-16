@@ -46,11 +46,13 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
   }, [destino.id, destino.capacidadDiaria, fechaViaje]);
 
   // Calculo de tarifa con desglose de subtotal, iva 13% y total
-  const personasNumerico = Number(numPersonas) > 0 ? Number(numPersonas) : 1;
+  const personasEntero = parseInt(numPersonas, 10);
+  const esCantidadValida = Number.isInteger(personasEntero) && personasEntero >= 1 && String(numPersonas).trim() === String(personasEntero);
+  const personasParaCalculo = esCantidadValida ? personasEntero : 0;
 
   const subtotal = useMemo(() => {
-    return destino.precioBase * personasNumerico;
-  }, [destino.precioBase, personasNumerico]);
+    return destino.precioBase * personasParaCalculo;
+  }, [destino.precioBase, personasParaCalculo]);
 
   const iva = useMemo(() => {
     return Math.round(subtotal * 0.13 * 100) / 100;
@@ -62,7 +64,28 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
 
   // Validacion de cupo maximo disponible para la fecha
   const sinCupos = cuposDisponibles <= 0;
-  const superaCapacidad = personasNumerico > cuposDisponibles;
+  const superaCapacidad = esCantidadValida && personasEntero > cuposDisponibles;
+
+  //* Bloquea teclas no numéricas: signos (+, -), decimales (., ,) y notación científica (e, E)
+  const handleKeyDownPersonas = (e) => {
+    if (['+', '-', 'e', 'E', '.', ','].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
+  //* Bloquea el pegado de cualquier carácter que no sea un dígito numérico 0-9
+  const handlePastePersonas = (e) => {
+    const texto = e.clipboardData.getData('text');
+    if (!/^\d+$/.test(texto)) {
+      e.preventDefault();
+    }
+  };
+
+  //* Mantiene únicamente dígitos numéricos en el estado
+  const handleChangePersonas = (e) => {
+    const soloDigitos = e.target.value.replace(/\D/g, '');
+    setNumPersonas(soloDigitos);
+  };
 
   // Envio del formulario con procesamiento bancario simulado
   const handleSubmit = async (e) => {
@@ -71,6 +94,12 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
 
     if (!clienteNombre.trim() || !clienteEmail.trim() || !fechaViaje) {
       setErrorMensaje('Por favor complete todos los campos del formulario.');
+      return;
+    }
+
+    //! Validar cantidad de personas: debe ser un entero válido mayor o igual a 1
+    if (!numPersonas || !esCantidadValida) {
+      setErrorMensaje('Por favor ingrese un número de personas válido (entero mayor o igual a 1).');
       return;
     }
 
@@ -97,13 +126,13 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
         clienteNombre: clienteNombre.trim(),
         clienteEmail: clienteEmail.trim().toLowerCase(),
         fechaViaje,
-        numPersonas: personasNumerico,
+        numPersonas: personasEntero,
         ultimosDigitosTarjeta: digitosLimpios,
       });
 
       // Descuenta de inmediato los cupos en la pantalla solo si fue confirmada (RN-01)
       if (respuesta.estado !== 'RECHAZADA') {
-        setCuposDisponibles((prev) => Math.max(0, prev - personasNumerico));
+        setCuposDisponibles((prev) => Math.max(0, prev - personasEntero));
       }
 
       setReservaCreada(respuesta);
@@ -317,12 +346,10 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
                     min="1"
                     max={Math.max(1, cuposDisponibles)}
                     value={numPersonas}
-                    onChange={(e) => setNumPersonas(e.target.value)}
-                    onBlur={() => {
-                      if (!numPersonas || Number(numPersonas) < 1) {
-                        setNumPersonas(1);
-                      }
-                    }}
+                    onKeyDown={handleKeyDownPersonas}
+                    onPaste={handlePastePersonas}
+                    onChange={handleChangePersonas}
+                    placeholder="Ej: 2"
                     required
                   />
                   <small className="campo-ayuda">
@@ -334,7 +361,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
               <div className="desglose-tarifa">
                 <div className="desglose-titulo">Cotización Automática</div>
                 <div className="desglose-fila">
-                  <span>Precio base ({personasNumerico} persona{personasNumerico > 1 ? 's' : ''}):</span>
+                  <span>Precio base ({personasParaCalculo} persona{personasParaCalculo === 1 ? '' : 's'}):</span>
                   <span>{formatearColones(subtotal)}</span>
                 </div>
                 <div className="desglose-fila">

@@ -1,17 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReservaService = exports.BusinessError = void 0;
+exports.ReservaService = exports.validarCantidadPersonas = exports.BusinessError = void 0;
 const cotizacion_service_1 = require("./cotizacion.service");
-// Errores de negocio tipados 
-class BusinessError extends Error {
-    constructor(title, message, statusCode = 400) {
-        super(message);
-        this.title = title;
-        this.statusCode = statusCode;
-        this.name = 'BusinessError';
-    }
-}
-exports.BusinessError = BusinessError;
+const validaciones_1 = require("./validaciones");
+Object.defineProperty(exports, "BusinessError", { enumerable: true, get: function () { return validaciones_1.BusinessError; } });
+Object.defineProperty(exports, "validarCantidadPersonas", { enumerable: true, get: function () { return validaciones_1.validarCantidadPersonas; } });
 // Servicio 
 class ReservaService {
     constructor(reservaRepo, destinoRepo) {
@@ -21,17 +14,19 @@ class ReservaService {
     }
     //* Crea una reserva aplicando RN-01 (cupos), RN-03 (tarifa) y RN-04 (pago simulado).
     async crearReserva(data) {
+        //! Valida que la cantidad de personas sea un entero estricto mayor o igual a 1.
+        (0, validaciones_1.validarCantidadPersonas)(data.numPersonas);
         // Verificar que el destino existe y está activo
         const destino = await this.destinoRepo.findById(data.destinoId);
         if (!destino || !destino.activo) {
-            throw new BusinessError('Destino no disponible', 'El destino no existe o está desactivado.', 404);
+            throw new validaciones_1.BusinessError('Destino no disponible', 'El destino no existe o está desactivado.', 404);
         }
         //! RN-01: Validar que las personas ya reservadas + nuevas no excedan la capacidad diaria.
         const personasOcupadas = await this.reservaRepo.countPersonasByDestinoAndFecha(data.destinoId, data.fechaViaje);
         const totalPersonas = personasOcupadas + data.numPersonas;
         if (totalPersonas > destino.capacidadDiaria) {
             const disponibles = destino.capacidadDiaria - personasOcupadas;
-            throw new BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para esa fecha.`, 409);
+            throw new validaciones_1.BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para esa fecha.`, 409);
         }
         //! RN-03: Calcular la tarifa usando el servicio de cotización.
         const _cotizacion = this.cotizacionService.calcular({
@@ -41,7 +36,7 @@ class ReservaService {
         //! RN-04: Gateway simulado por paridad del último dígito de la tarjeta.
         const ultimoDigito = parseInt(data.ultimosDigitosTarjeta[data.ultimosDigitosTarjeta.length - 1], 10);
         if (isNaN(ultimoDigito)) {
-            throw new BusinessError('Datos de pago inválidos', 'Los dígitos de la tarjeta deben ser numéricos.', 400);
+            throw new validaciones_1.BusinessError('Datos de pago inválidos', 'Los dígitos de la tarjeta deben ser numéricos.', 400);
         }
         const esPar = ultimoDigito % 2 === 0;
         //! RF-03 / RN-04: Par genera CONFIRMADA, impar genera RECHAZADA sin abortar ni bloquear guardado
@@ -56,7 +51,7 @@ class ReservaService {
         }
         catch (err) {
             if (err.message && err.message.includes('Cupo insuficiente')) {
-                throw new BusinessError('Cupo insuficiente', err.message, 409);
+                throw new validaciones_1.BusinessError('Cupo insuficiente', err.message, 409);
             }
             throw err;
         }
@@ -65,21 +60,21 @@ class ReservaService {
     async obtenerReserva(id) {
         const reserva = await this.reservaRepo.findById(id);
         if (!reserva) {
-            throw new BusinessError('Reserva no encontrada', `No existe una reserva con ID ${id}.`, 404);
+            throw new validaciones_1.BusinessError('Reserva no encontrada', `No existe una reserva con ID ${id}.`, 404);
         }
         return reserva;
     }
     //* RF-04: Obtiene una reserva por su código de confirmación y valida opcionalmente el correo coincidente.
     async obtenerPorCodigo(codigo, correo) {
         if (!this.reservaRepo.findByCodigo) {
-            throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por código.', 500);
+            throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por código.', 500);
         }
         const reserva = await this.reservaRepo.findByCodigo(codigo);
         if (!reserva) {
-            throw new BusinessError('Reserva no encontrada', `No existe una reserva con el código ${codigo}.`, 404);
+            throw new validaciones_1.BusinessError('Reserva no encontrada', `No existe una reserva con el código ${codigo}.`, 404);
         }
         if (correo && reserva.clienteEmail.toLowerCase() !== correo.trim().toLowerCase()) {
-            throw new BusinessError('Acceso denegado', 'El correo no coincide con la reserva.', 403);
+            throw new validaciones_1.BusinessError('Acceso denegado', 'El correo no coincide con la reserva.', 403);
         }
         return reserva;
     }
@@ -92,7 +87,7 @@ class ReservaService {
     async eliminarReservaAdmin(id) {
         await this.obtenerReserva(id);
         if (!this.reservaRepo.delete) {
-            throw new BusinessError('Operación no soportada', 'El repositorio no soporta eliminación.', 500);
+            throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta eliminación.', 500);
         }
         return this.reservaRepo.delete(id);
     }
@@ -100,21 +95,21 @@ class ReservaService {
     async actualizarPagoAdmin(id, estadoPago) {
         await this.obtenerReserva(id);
         if (!this.reservaRepo.updateEstadoPago) {
-            throw new BusinessError('Operación no soportada', 'El repositorio no soporta actualización de pago.', 500);
+            throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta actualización de pago.', 500);
         }
         return this.reservaRepo.updateEstadoPago(id, estadoPago);
     }
     //* Obtiene las reservas asociadas al correo de un cliente.
     async obtenerPorCorreo(correo) {
         if (!this.reservaRepo.findByCorreo) {
-            throw new BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por correo.', 500);
+            throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por correo.', 500);
         }
         return this.reservaRepo.findByCorreo(correo);
     }
     //* CAR-06: Lista todas las reservas registradas para monitoreo y auditoría administrativa.
     async listarTodas() {
         if (!this.reservaRepo.findAll) {
-            throw new BusinessError('Operación no soportada', 'El repositorio no soporta listar todas las reservas.', 500);
+            throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta listar todas las reservas.', 500);
         }
         return this.reservaRepo.findAll();
     }
@@ -122,7 +117,7 @@ class ReservaService {
     async cancelarReserva(id) {
         const reserva = await this.obtenerReserva(id);
         if (reserva.estado === 'CANCELADA') {
-            throw new BusinessError('Estado inválido', 'La reserva ya está cancelada.', 400);
+            throw new validaciones_1.BusinessError('Estado inválido', 'La reserva ya está cancelada.', 400);
         }
         this.validarVentana48h(reserva.fechaViaje, 'cancelar');
         return this.reservaRepo.updateEstado(id, 'CANCELADA');
@@ -131,17 +126,17 @@ class ReservaService {
     async reprogramarReserva(id, nuevaFecha) {
         const reserva = await this.obtenerReserva(id);
         if (reserva.estado === 'CANCELADA') {
-            throw new BusinessError('Estado inválido', 'No se puede reprogramar una reserva cancelada.', 400);
+            throw new validaciones_1.BusinessError('Estado inválido', 'No se puede reprogramar una reserva cancelada.', 400);
         }
         this.validarVentana48h(reserva.fechaViaje, 'reprogramar');
         //! RN-01: Verificar cupos en la nueva fecha antes de reprogramar.
         const destino = await this.destinoRepo.findById(reserva.destinoId);
         if (!destino)
-            throw new BusinessError('Destino no disponible', 'El destino de la reserva ya no existe.', 404);
+            throw new validaciones_1.BusinessError('Destino no disponible', 'El destino de la reserva ya no existe.', 404);
         const personasOcupadas = await this.reservaRepo.countPersonasByDestinoAndFecha(reserva.destinoId, nuevaFecha);
         if (personasOcupadas + reserva.numPersonas > destino.capacidadDiaria) {
             const disponibles = destino.capacidadDiaria - personasOcupadas;
-            throw new BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para la nueva fecha.`, 409);
+            throw new validaciones_1.BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para la nueva fecha.`, 409);
         }
         return this.reservaRepo.updateFecha(id, nuevaFecha);
     }
@@ -149,7 +144,7 @@ class ReservaService {
     async consultarCuposDisponibles(destinoId, fechaViaje) {
         const destino = await this.destinoRepo.findById(destinoId);
         if (!destino) {
-            throw new BusinessError('Destino no disponible', 'El destino no existe.', 404);
+            throw new validaciones_1.BusinessError('Destino no disponible', 'El destino no existe.', 404);
         }
         const ocupados = await this.reservaRepo.countPersonasByDestinoAndFecha(destinoId, fechaViaje);
         const disponibles = Math.max(0, destino.capacidadDiaria - ocupados);
@@ -167,7 +162,7 @@ class ReservaService {
         const diferenciaMs = viaje.getTime() - ahora.getTime();
         const diferenciaHoras = diferenciaMs / (1000 * 60 * 60);
         if (diferenciaHoras <= 48) {
-            throw new BusinessError('Ventana temporal vencida', `No se puede ${accion} la reserva con menos de 48 horas de anticipación.`, 400);
+            throw new validaciones_1.BusinessError('Ventana temporal vencida', `No se puede ${accion} la reserva con menos de 48 horas de anticipación.`, 400);
         }
     }
     //* Genera un código de confirmación con formato 'VY-XXXX-XX'.

@@ -26,8 +26,8 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
     return guardado ? JSON.parse(guardado) : null;
   });
 
-  const [correoLogin, setCorreoLogin] = useState('admin@gmail.com');
-  const [passwordLogin, setPasswordLogin] = useState('01010');
+  const [correoLogin, setCorreoLogin] = useState('');
+  const [passwordLogin, setPasswordLogin] = useState('');
   const [cargandoLogin, setCargandoLogin] = useState(false);
   const [errorLogin, setErrorLogin] = useState('');
 
@@ -451,7 +451,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                   type="email"
                   value={correoLogin}
                   onChange={(e) => setCorreoLogin(e.target.value)}
-                  placeholder="admin@viajaya.com"
+                  placeholder="ejemplo@correo.com"
                   required
                 />
               </div>
@@ -463,7 +463,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                   type="password"
                   value={passwordLogin}
                   onChange={(e) => setPasswordLogin(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Ingresa tu contraseña"
                   required
                 />
               </div>
@@ -477,10 +477,6 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                 {cargandoLogin ? 'Autenticando...' : 'Iniciar Sesión'}
               </button>
             </form>
-
-            <div style={{ marginTop: '20px', padding: '12px', background: 'var(--color-arena-claro)', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--color-texto-suave)', border: '1px solid var(--color-borde-suave)' }}>
-              Credenciales de prueba registradas: correo admin@gmail.com, contraseña 01010
-            </div>
           </div>
         </div>
       </section>
