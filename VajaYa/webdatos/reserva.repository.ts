@@ -4,7 +4,7 @@
 
 import { PoolClient } from 'pg';
 import { pool } from './db.config';
-import {
+import type {
   IReservaRepository,
   Reserva,
   EstadoReserva,

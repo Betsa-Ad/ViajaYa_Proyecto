@@ -5,8 +5,8 @@ const express_1 = require("express");
 const reserva_controller_1 = require("../controllers/reserva.controller");
 const reserva_service_1 = require("../services/reserva.service");
 // Repositorios reales de webdatos conectados a Supabase.
-const { ReservaRepository } = require('@webdatos/reserva.repository');
-const { DestinoRepository } = require('@webdatos/destino.repository');
+const { ReservaRepository } = require('../../../webdatos/reserva.repository.js');
+const { DestinoRepository } = require('../../../webdatos/destino.repository.js');
 //* Inyección de dependencias: repositorios reales conectados a Supabase.
 const reservaRepo = new ReservaRepository();
 const destinoRepo = new DestinoRepository();

@@ -6,9 +6,9 @@ const admin_controller_1 = require("../controllers/admin.controller");
 const admin_service_1 = require("../services/admin.service");
 const reserva_service_1 = require("../services/reserva.service");
 // Repositorios reales de webdatos conectados a Supabase.
-const { AdminRepository } = require('@webdatos/admin.repository');
-const { ReservaRepository } = require('@webdatos/reserva.repository');
-const { DestinoRepository } = require('@webdatos/destino.repository');
+const { AdminRepository } = require('../../../webdatos/admin.repository.js');
+const { ReservaRepository } = require('../../../webdatos/reserva.repository.js');
+const { DestinoRepository } = require('../../../webdatos/destino.repository.js');
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const adminRepo = new AdminRepository();
 const reservaRepo = new ReservaRepository();

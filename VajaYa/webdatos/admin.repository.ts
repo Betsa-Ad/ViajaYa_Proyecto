@@ -1,7 +1,7 @@
 
 // Acceso a datos para el Administrador en PostgreSQL (Supabase).
 import { pool } from './db.config';
-import { Administrador, IAdminRepository } from '../webnegocio/src/interfaces/IAdminRepository';
+import type { Administrador, IAdminRepository } from '../webnegocio/src/interfaces/IAdminRepository';
 
 export class AdminRepository implements IAdminRepository {
   // Busca un administrador por su correo electrónico en la tabla administrador

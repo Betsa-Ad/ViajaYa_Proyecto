@@ -5,7 +5,7 @@ const express_1 = require("express");
 const destino_controller_1 = require("../controllers/destino.controller");
 const destino_service_1 = require("../services/destino.service");
 // Repositorio real de webdatos conectado a Supabase.
-const { DestinoRepository } = require('@webdatos/destino.repository');
+const { DestinoRepository } = require('../../../webdatos/destino.repository.js');
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 //* Inyección de dependencias: repositorio real conectado a Supabase.
 const repo = new DestinoRepository();

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Capa de Acceso a Datos - Sistema ViajaYa",
   "main": "index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "dotenv": "^16.6.1",
     "pg": "^8.23.1"

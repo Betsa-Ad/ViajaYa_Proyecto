@@ -1,7 +1,7 @@
 
 // Acceso a datos para destinos en PostgreSQL (Supabase).
 import { pool } from './db.config';
-import {IDestinoRepository, Destino, CreateDestinoDto,UpdateDestinoDto, } from '../webnegocio/src/interfaces/IDestinoRepository';
+import type { IDestinoRepository, Destino, CreateDestinoDto, UpdateDestinoDto } from '../webnegocio/src/interfaces/IDestinoRepository';
 
 // Mapea una fila de la base de datos (snake_case) al modelo de negocio (camelCase)
 function mapDestino(row: any): Destino {
