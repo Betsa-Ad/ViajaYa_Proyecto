@@ -6,6 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
 const error_middleware_1 = require("./middlewares/error.middleware");
 const destino_routes_1 = __importDefault(require("./routes/destino.routes"));
 const cotizacion_routes_1 = __importDefault(require("./routes/cotizacion.routes"));
@@ -13,19 +14,10 @@ const reserva_routes_1 = __importDefault(require("./routes/reserva.routes"));
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const app = (0, express_1.default)();
 // Middlewares globales 
+//* Habilita CORS para permitir peticiones desde orígenes externos (como Render o localhost).
+app.use((0, cors_1.default)());
 //* Parsea el body de las peticiones como JSON.
 app.use(express_1.default.json());
-//* Habilita CORS para permitir peticiones desde el frontend webpresentacion.
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    if (req.method === 'OPTIONS') {
-        res.sendStatus(204);
-        return;
-    }
-    next();
-});
 // Health check 
 //* Endpoint de salud para verificar que el servidor está en pie.
 app.get('/health', (_req, res) => {

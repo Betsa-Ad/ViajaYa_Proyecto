@@ -6,10 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Punto de entrada del servidor — arranca Express en el puerto configurado.
 require("dotenv/config");
 const app_1 = __importDefault(require("./app"));
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 //* Inicia el servidor HTTP y muestra la URL base de la API en consola.
 app_1.default.listen(PORT, () => {
-    console.log(`✅ ViajaYa [webnegocio] corriendo en http://localhost:${PORT}`);
+    console.log(`ViajaYa [webnegocio] corriendo en http://localhost:${PORT}`);
     console.log(`   → Destinos:   http://localhost:${PORT}/api/destinos`);
     console.log(`   → Cotizar:    http://localhost:${PORT}/api/cotizar`);
     console.log(`   → Reservas:   http://localhost:${PORT}/api/reservas`);

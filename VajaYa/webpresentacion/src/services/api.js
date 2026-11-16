@@ -1,5 +1,8 @@
-// Servicio para conectar con la API backend en http://localhost:3000
-const API_BASE_URL = 'http://localhost:3000/api';
+// Base URL del backend configurada dinámicamente mediante variable de entorno para producción (Render) y desarrollo local
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = BASE_URL.replace(/\/+$/, '').endsWith('/api')
+  ? BASE_URL.replace(/\/+$/, '')
+  : `${BASE_URL.replace(/\/+$/, '')}/api`;
 
 // Obtiene la cabecera de autenticacion con el token de localStorage
 function getAuthHeaders(tokenParam) {
@@ -42,7 +45,7 @@ async function request(endpoint, options = {}) {
     return data;
   } catch (error) {
     if (!error.status) {
-      error.message = 'No se pudo conectar con el servidor backend en http://localhost:3000. Por favor verifica que esté en ejecución.';
+      error.message = `No se pudo conectar con el servidor backend en ${BASE_URL}. Por favor verifica que esté en ejecución.`;
     }
     throw error;
   }

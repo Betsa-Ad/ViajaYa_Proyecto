@@ -3,7 +3,7 @@
 import 'dotenv/config';
 import app from './app';
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT || 3000;
 
 //* Inicia el servidor HTTP y muestra la URL base de la API en consola.
 app.listen(PORT, () => {
