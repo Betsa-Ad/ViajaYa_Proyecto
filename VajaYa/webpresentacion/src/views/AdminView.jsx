@@ -15,6 +15,7 @@ import {
   guardarFotoDestino,
   comprimirImagen,
   corregirTexto,
+  resolverNombreDestino,
 } from '../utils/imagenes';
 import Alerta from '../components/Alerta';
 
@@ -470,7 +471,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
 
               <button
                 type="submit"
-                className="btn btn-oceano"
+                className="btn btn-cta"
                 disabled={cargandoLogin}
                 style={{ width: '100%', marginTop: '8px' }}
               >
@@ -524,7 +525,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
         {tabActiva === 'destinos' && (
           <div>
             {/* Formulario para crear nuevo destino con soporte de imagenes */}
-            <div style={{ background: 'var(--color-blanco-calido)', padding: '24px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(18, 72, 90, 0.08)', marginBottom: '32px', border: '1px solid var(--color-borde-suave)' }}>
+            <div style={{ background: 'var(--color-blanco)', padding: '24px', borderRadius: '10px', boxShadow: 'var(--sombra-suave)', marginBottom: '32px', border: '1px solid var(--color-borde)' }}>
               <h3 style={{ marginBottom: '16px', color: 'var(--color-azul-oceano)' }}>+ Crear Nuevo Destino</h3>
               <form onSubmit={handleCrearDestino} className="formulario">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
@@ -757,7 +758,7 @@ export default function AdminView({ destinos, onRecargarDestinos }) {
                           <div><strong>{r.clienteNombre}</strong></div>
                           <small style={{ color: 'var(--color-texto-suave)' }}>{r.clienteEmail}</small>
                         </td>
-                        <td>{r.destinoNombre || `Destino #${r.destinoId}`}</td>
+                        <td>{resolverNombreDestino(r, null, destinos)}</td>
                         <td><strong>{r.fechaViaje}</strong></td>
                         <td>{r.numPersonas}</td>
                         <td><strong>{formatearColones(r.total)}</strong></td>

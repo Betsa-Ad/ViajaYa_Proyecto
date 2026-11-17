@@ -3,14 +3,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReservaRepository = void 0;
 const db_config_1 = require("./db.config");
-// Mapea las columnas SQL (snake_case) al contrato de TypeScript (camelCase)
+//* Mapea las columnas SQL (snake_case) al contrato de TypeScript (camelCase)
 function mapReserva(row) {
     const nombreCompleto = [row.cliente_nombre, row.cliente_apellido1, row.cliente_apellido2]
         .filter(Boolean)
         .join(' ');
+    const nombreDestino = row.destino_nombre || row.nombre_destino || undefined;
     return {
         id: String(row.id_reserva),
         destinoId: String(row.id_destino),
+        destinoNombre: nombreDestino,
+        nombreDestino: nombreDestino,
         clienteNombre: nombreCompleto,
         clienteEmail: row.cliente_email,
         fechaViaje: row.fecha_viaje,
@@ -25,11 +28,12 @@ function mapReserva(row) {
 }
 class ReservaRepository {
     constructor() {
-        // Consulta base común para reutilizar entre búsquedas y evitar duplicar SQL (DRY)
+        //! Consulta base común con JOIN a destino para resolver su nombre (DRY / SOLID)
         this.selectReservaBase = `
     SELECT 
       r.id_reserva,
       r.id_destino,
+      d.nombre AS destino_nombre,
       r.id_cliente,
       r.codigo_confirmacion,
       TO_CHAR(r.fecha_viaje, 'YYYY-MM-DD') AS fecha_viaje,
@@ -44,6 +48,7 @@ class ReservaRepository {
       c.correo AS cliente_email
     FROM reserva r
     JOIN cliente c ON r.id_cliente = c.id_cliente
+    LEFT JOIN destino d ON r.id_destino = d.id_destino
   `;
     }
     // Busca una reserva por su ID numérico
@@ -242,6 +247,7 @@ class ReservaRepository {
             id: String(row.id_reserva),
             destinoId: String(row.id_destino),
             destinoNombre: row.destino_nombre ?? undefined,
+            nombreDestino: row.destino_nombre ?? undefined,
             clienteNombre: [row.cliente_nombre, row.cliente_apellido1, row.cliente_apellido2]
                 .filter(Boolean)
                 .join(' '),

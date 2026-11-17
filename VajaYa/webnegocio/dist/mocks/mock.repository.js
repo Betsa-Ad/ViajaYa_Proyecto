@@ -91,9 +91,18 @@ class MockReservaRepository {
     }
     //* Inserta una nueva reserva con estado y código ya calculados por el servicio.
     async create(data) {
+        const nombreDestino = data.destinoNombre ||
+            data.nombreDestino ||
+            (data.destinoId === 'dest-001'
+                ? 'Playa Tamarindo'
+                : data.destinoId === 'dest-002'
+                    ? 'Volcán Arenal'
+                    : 'Destino turístico');
         const nueva = {
             id: (0, uuid_1.v4)(),
             destinoId: data.destinoId,
+            destinoNombre: nombreDestino,
+            nombreDestino: nombreDestino,
             clienteNombre: data.clienteNombre,
             clienteEmail: data.clienteEmail,
             fechaViaje: data.fechaViaje,

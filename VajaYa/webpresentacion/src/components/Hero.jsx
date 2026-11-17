@@ -16,7 +16,7 @@ export default function Hero({ onExplorarDestinos }) {
           </p>
           <button
             type="button"
-            className="btn btn-turquesa"
+            className="btn btn-cta"
             onClick={onExplorarDestinos}
             style={{ fontSize: '1.05rem', padding: '14px 28px' }}
           >

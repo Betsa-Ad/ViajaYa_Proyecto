@@ -1,11 +1,20 @@
 // Coleccion de fotografias por defecto para destinos de Costa Rica
 const FOTOS_DESTINOS = {
 
-  tortuguero: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80',
-  'manuel antonio': 'https://images.unsplash.com/photo-1589556264800-08ae9e129a8c?auto=format&fit=crop&w=800&q=80',
+  tortuguero: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/44/dd/b3/stunning.jpg?w=1200&h=1200&s=1',
+  'manuel antonio': 'https://www.vyoforestal.com/wp-content/uploads/2024/06/Manuel-Antonio-Entrada-1200x675.jpg',
+  'volcán arenal': 'https://ecoterracostarica.com/wp-content/uploads/2025/11/Sceince-behind-arenal-voolcano.jpg',
+  'isla uvita': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBYPl6HqTzf1rLmrCWXnynHm0GXmJuLAJKlXupLqiPGrjE1TPTu9rkpAer&s=10',
+  'tortugero': 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/44/dd/b3/stunning.jpg?w=1200&h=1200&s=1',
+  'bosque nuboso': 'https://www.therealdealtours.com/blog/wp-content/uploads/2021/11/monteverde_cloud_forest_reserve1-696x522.jpg',
+  'catarata la fortuna': 'https://fotohiking.com/wp-content/uploads/2020/10/49913542982_24c9b617b5_h.jpg',
+  'mirador de orosí': 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/1e/5e/55/caption.jpg?w=900&h=500&s=1',
+  
+  
+  
 };
 
-const FOTO_POR_DEFECTO = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80';
+const FOTO_POR_DEFECTO = 'https://pic-2.vpackage.net/viaje_a_Costa%20Rica/intinerariodeviajeaCostaRica6_80665.jpg';
 
 // Redimensiona y comprime una imagen local mediante canvas nativo
 export function comprimirImagen(archivo, anchoMax = 600, calidad = 0.7) {
@@ -111,4 +120,16 @@ export function formatearColones(monto) {
     currency: 'CRC',
     maximumFractionDigits: 0,
   }).format(monto);
+}
+
+//* Resuelve el nombre del destino a partir de la reserva o destino asociado (DRY)
+export function resolverNombreDestino(reserva, destino = null, catalogoDestinos = []) {
+  if (reserva?.nombreDestino) return reserva.nombreDestino;
+  if (reserva?.destinoNombre) return reserva.destinoNombre;
+  if (destino?.nombre) return destino.nombre;
+  if (catalogoDestinos && catalogoDestinos.length > 0 && reserva?.destinoId) {
+    const encontrado = catalogoDestinos.find((d) => String(d.id) === String(reserva.destinoId));
+    if (encontrado?.nombre) return encontrado.nombre;
+  }
+  return reserva?.destinoId ? `Destino #${reserva.destinoId}` : 'Destino turístico';
 }

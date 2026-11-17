@@ -1,28 +1,61 @@
-/* Paleta de colores tropical ViajaYa */
+/* //* Paleta oficial "Agencia de Viajes" centralizada en :root (DRY) */
 :root {
-  --color-arena: #EADCC5;
-  --color-arena-claro: #F5EEE2;
-  --color-blanco-calido: #FAF8F2;
-  --color-azul-oceano: #12485A;
-  --color-azul-oceano-hover: #0E3A49;
-  --color-turquesa: #167C80;
-  --color-turquesa-hover: #116265;
-  --color-verde-agua: #75B9AE;
-  --color-verde-agua-claro: #E6F3F1;
-  --color-texto: #10262E;
-  --color-texto-suave: #2C4852;
-  --color-borde: #75B9AE;
-  --color-borde-suave: #D1C5B0;
-  --color-error: #C53030;
-  --color-error-fondo: #FED7D7;
-  --color-exito: #167C80;
-  --color-exito-fondo: #E6F3F1;
-  --color-aviso: #B7791F;
-  --color-aviso-fondo: #FEFCBF;
+  /* Azul petróleo profundo: Navbar, encabezados principales, textos oscuros y botones secundarios */
+  --color-azul-petroleo: #26474E;
+  --color-azul-petroleo-hover: #1D373D;
+
+  /* Naranja coral vibrante: Botones principales de acción y conversión (texto blanco) */
+  --color-naranja-coral: #FF6531;
+  --color-naranja-coral-hover: #E55322;
+
+  /* Turquesa brillante: Estados :hover, iconos destacados, enlaces activos y foco en formularios */
+  --color-turquesa: #2CCED2;
+  --color-turquesa-hover: #22B5B9;
+
+  /* Celeste agua suave: Etiquetas de cupo, badges, encabezados de tabla y fondos secundarios */
+  --color-celeste-suave: #B9EDED;
+  --color-celeste-suave-fondo: #EAF8F8;
+
+  /* Fondo general limpio y neutros de alta legibilidad */
+  --color-fondo-general: #F8FAFA;
+  --color-blanco: #FFFFFF;
+  --color-texto: #1F2937;
+  --color-texto-suave: #4B5563;
+
+  /* Bordes */
+  --color-borde: #D1E5E7;
+  --color-borde-suave: #E2EFF0;
+
+  /* Mapeo de compatibilidad con componentes existentes (DRY) */
+  --color-azul-oceano: var(--color-azul-petroleo);
+  --color-azul-oceano-hover: var(--color-azul-petroleo-hover);
+  --color-verde-oliva: var(--color-azul-petroleo);
+  --color-verde-oliva-hover: var(--color-azul-petroleo-hover);
+  --color-verde-salvia: var(--color-turquesa);
+  --color-verde-agua: var(--color-turquesa);
+  --color-verde-agua-claro: var(--color-celeste-suave-fondo);
+  --color-verde-menta: var(--color-celeste-suave);
+  --color-verde-menta-suave: var(--color-celeste-suave-fondo);
+  --color-amarillo-ambar: var(--color-naranja-coral);
+  --color-amarillo-ambar-hover: var(--color-naranja-coral-hover);
+  --color-durazno: var(--color-borde);
+  --color-arena: var(--color-fondo-general);
+  --color-arena-claro: var(--color-celeste-suave-fondo);
+  --color-blanco-calido: #FFFFFF;
+
+  /* Manejo de errores y alertas accesible */
+  --color-error: #DC2626;
+  --color-error-fondo: #FEE2E2;
+  --color-exito: var(--color-azul-petroleo);
+  --color-exito-fondo: var(--color-celeste-suave-fondo);
+  --color-aviso: #D97706;
+  --color-aviso-fondo: #FEF3C7;
+
+  /* Tipografía y sombras */
   --fuente-principal: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --radio-borde: 10px;
-  --sombra-suave: 0 4px 15px rgba(18, 72, 90, 0.08);
-  --sombra-media: 0 8px 24px rgba(18, 72, 90, 0.14);
+  --sombra-suave: 0 4px 15px rgba(38, 71, 78, 0.08);
+  --sombra-media: 0 8px 24px rgba(38, 71, 78, 0.14);
   --transicion: all 0.25s ease;
 }
 
@@ -32,10 +65,11 @@
   padding: 0;
 }
 
+/* //* Estilos globales y fondo limpio */
 body {
   font-family: var(--fuente-principal);
   color: var(--color-texto);
-  background-color: var(--color-arena);
+  background-color: var(--color-fondo-general);
   line-height: 1.6;
   min-height: 100vh;
   display: flex;
@@ -58,8 +92,9 @@ main {
   flex: 1;
 }
 
+/* //* Encabezados principales en azul petróleo profundo */
 h1, h2, h3, h4 {
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -82,7 +117,7 @@ a {
 
 .seccion {
   padding: 50px 0;
-  background-color: var(--color-arena);
+  background-color: var(--color-fondo-general);
 }
 
 .seccion-titulo {
@@ -93,7 +128,7 @@ a {
 .seccion-titulo h2 {
   font-size: 2rem;
   margin-bottom: 8px;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
 }
 
 .seccion-titulo p {
@@ -103,7 +138,7 @@ a {
   margin: 0 auto;
 }
 
-/* Ocultar flechas de incremento en campos numericos */
+/* Ocultar flechas de incremento en campos numéricos */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -115,14 +150,14 @@ input[type="number"] {
   appearance: textfield;
 }
 
-/* Encabezado y navegacion principal */
+/* //* Barra de navegación superior (Navbar) en azul petróleo profundo */
 .navbar {
-  background-color: var(--color-azul-oceano);
-  color: var(--color-blanco-calido);
+  background-color: var(--color-azul-petroleo);
+  color: var(--color-blanco);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(18, 72, 90, 0.25);
+  box-shadow: 0 2px 10px rgba(38, 71, 78, 0.25);
 }
 
 .navbar-contenedor {
@@ -150,7 +185,7 @@ input[type="number"] {
 .navbar-link {
   background: none;
   border: none;
-  color: #D4E7E3;
+  color: #FFFFFF;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -161,43 +196,46 @@ input[type="number"] {
 
 .navbar-link:hover,
 .navbar-link.activo {
-  color: var(--color-blanco-calido);
-  background-color: rgba(117, 185, 174, 0.2);
+  color: #FFFFFF;
+  background-color: rgba(44, 206, 210, 0.25);
+  border-bottom: 2px solid var(--color-turquesa);
 }
 
 .navbar-admin-btn {
   background-color: var(--color-turquesa);
-  color: var(--color-blanco-calido);
-  border: 1px solid var(--color-verde-agua);
+  color: var(--color-azul-petroleo);
+  border: 1px solid var(--color-turquesa);
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   padding: 7px 16px;
   border-radius: 20px;
   transition: var(--transicion);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 .navbar-admin-btn:hover,
 .navbar-admin-btn.activo {
-  background-color: var(--color-turquesa-hover);
+  background-color: var(--color-naranja-coral);
+  border-color: var(--color-naranja-coral);
+  color: #FFFFFF;
 }
 
 .menu-toggle {
   display: none;
   background: none;
   border: none;
-  color: var(--color-blanco-calido);
+  color: #FFFFFF;
   font-size: 1.5rem;
   cursor: pointer;
 }
 
-/* Portada hero */
+/* //* Portada principal Hero con superposición en azul petróleo */
 .hero {
-  background: linear-gradient(rgba(18, 72, 90, 0.72), rgba(18, 72, 90, 0.75)),
-    url('https://images.unsplash.com/photo-1518182170546-07661fd94144?auto=format&fit=crop&w=1600&q=80')
+  background: linear-gradient(rgba(38, 71, 78, 0.85), rgba(29, 55, 61, 0.90)),
+    url('https://www.viajeroscallejeros.com/wp-content/uploads/conchal-mejores-playas-guanacaste.jpg')
       center/cover no-repeat;
-  color: var(--color-blanco-calido);
+  color: #FFFFFF;
   padding: 100px 0 90px 0;
   text-align: center;
 }
@@ -209,9 +247,9 @@ input[type="number"] {
 
 .hero-tag {
   display: inline-block;
-  background-color: rgba(117, 185, 174, 0.25);
-  border: 1px solid var(--color-verde-agua);
-  color: #E6F3F1;
+  background-color: rgba(44, 206, 210, 0.20);
+  border: 1px solid var(--color-turquesa);
+  color: #FFFFFF;
   font-size: 0.85rem;
   font-weight: 700;
   padding: 4px 14px;
@@ -222,20 +260,20 @@ input[type="number"] {
 
 .hero-titulo {
   font-size: 2.8rem;
-  color: var(--color-blanco-calido);
+  color: #FFFFFF;
   margin-bottom: 18px;
   font-weight: 800;
-  text-shadow: 0 2px 8px rgba(18, 72, 90, 0.5);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .hero-subtitulo {
   font-size: 1.2rem;
-  color: #F0F7F6;
+  color: #F0FDFD;
   margin-bottom: 30px;
   line-height: 1.6;
 }
 
-/* Destinos en catalogo */
+/* //* Catálogo de destinos y tarjetas */
 .grid-destinos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -243,11 +281,11 @@ input[type="number"] {
 }
 
 .tarjeta-destino {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   border-radius: var(--radio-borde);
   overflow: hidden;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
   display: flex;
   flex-direction: column;
   transition: var(--transicion);
@@ -256,13 +294,14 @@ input[type="number"] {
 .tarjeta-destino:hover {
   transform: translateY(-5px);
   box-shadow: var(--sombra-media);
+  border-color: var(--color-turquesa);
 }
 
 .tarjeta-imagen-wrapper {
   position: relative;
   height: 190px;
   overflow: hidden;
-  background-color: #DDEBE8;
+  background-color: var(--color-celeste-suave-fondo);
 }
 
 .tarjeta-imagen {
@@ -276,17 +315,18 @@ input[type="number"] {
   transform: scale(1.05);
 }
 
+/* //* Etiqueta de cupo en celeste agua suave con texto azul petróleo */
 .tarjeta-cupo-badge {
   position: absolute;
   top: 12px;
   right: 12px;
-  background-color: rgba(18, 72, 90, 0.9);
-  color: #FFFFFF;
+  background-color: var(--color-celeste-suave);
+  color: var(--color-azul-petroleo);
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px 10px;
   border-radius: 12px;
-  border: 1px solid var(--color-verde-agua);
+  border: 1px solid var(--color-turquesa);
   backdrop-filter: blur(4px);
 }
 
@@ -300,7 +340,7 @@ input[type="number"] {
 .tarjeta-nombre {
   font-size: 1.25rem;
   margin-bottom: 8px;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
 }
 
 .tarjeta-descripcion {
@@ -330,7 +370,7 @@ input[type="number"] {
 .tarjeta-precio-monto {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
 }
 
 .tarjeta-precio-monto small {
@@ -339,7 +379,7 @@ input[type="number"] {
   color: var(--color-texto-suave);
 }
 
-/* Botones institucionales */
+/* //* Botones: CTA en naranja coral y secundarios en azul petróleo */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -360,41 +400,57 @@ input[type="number"] {
   cursor: not-allowed;
 }
 
-/* Turquesa para botones de accion destacados */
+/* //* Botón de acción principal y conversión en naranja coral vibrante (texto blanco) */
+.btn-cta,
+.btn-coral,
+.btn-ambar,
+.btn-principal {
+  background-color: var(--color-naranja-coral);
+  color: #FFFFFF;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(255, 101, 49, 0.35);
+}
+
+.btn-cta:hover:not(:disabled),
+.btn-coral:hover:not(:disabled),
+.btn-ambar:hover:not(:disabled),
+.btn-principal:hover:not(:disabled) {
+  background-color: var(--color-naranja-coral-hover);
+  box-shadow: 0 4px 10px rgba(255, 101, 49, 0.45);
+}
+
+/* //* Botones secundarios y oscuros en azul petróleo profundo (texto blanco) */
+.btn-secundario,
+.btn-petroleo,
+.btn-oceano,
+.btn-oliva {
+  background-color: var(--color-azul-petroleo);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(38, 71, 78, 0.25);
+}
+
+.btn-secundario:hover:not(:disabled),
+.btn-petroleo:hover:not(:disabled),
+.btn-oceano:hover:not(:disabled),
+.btn-oliva:hover:not(:disabled) {
+  background-color: var(--color-azul-petroleo-hover);
+  box-shadow: 0 4px 10px rgba(38, 71, 78, 0.35);
+}
+
+/* //* Botón destacado en turquesa brillante */
 .btn-turquesa,
-.btn-terracota {
+.btn-terracota,
+.btn-salvia {
   background-color: var(--color-turquesa);
-  color: var(--color-blanco-calido);
-  box-shadow: 0 2px 6px rgba(22, 124, 128, 0.3);
+  color: var(--color-azul-petroleo);
+  font-weight: 700;
 }
 
 .btn-turquesa:hover:not(:disabled),
-.btn-terracota:hover:not(:disabled) {
+.btn-terracota:hover:not(:disabled),
+.btn-salvia:hover:not(:disabled) {
   background-color: var(--color-turquesa-hover);
-  box-shadow: 0 4px 10px rgba(22, 124, 128, 0.4);
-}
-
-/* Azul oceano para botones principales de consulta */
-.btn-oceano,
-.btn-oliva {
-  background-color: var(--color-azul-oceano);
-  color: var(--color-blanco-calido);
-  box-shadow: 0 2px 6px rgba(18, 72, 90, 0.25);
-}
-
-.btn-oceano:hover:not(:disabled),
-.btn-oliva:hover:not(:disabled) {
-  background-color: var(--color-azul-oceano-hover);
-}
-
-.btn-secundario {
-  background-color: var(--color-arena-claro);
-  color: var(--color-azul-oceano);
-  border: 1px solid var(--color-borde-suave);
-}
-
-.btn-secundario:hover:not(:disabled) {
-  background-color: #E6D8C0;
+  color: #FFFFFF;
 }
 
 .btn-peligro {
@@ -403,7 +459,7 @@ input[type="number"] {
 }
 
 .btn-peligro:hover:not(:disabled) {
-  background-color: #9B2C2C;
+  background-color: #B91C1C;
 }
 
 .btn-sm {
@@ -411,7 +467,7 @@ input[type="number"] {
   font-size: 0.85rem;
 }
 
-/* Formularios */
+/* //* Controles de formulario con enfoque en turquesa brillante */
 .formulario {
   display: flex;
   flex-direction: column;
@@ -436,9 +492,9 @@ input[type="number"] {
   font-family: inherit;
   font-size: 0.95rem;
   padding: 10px 14px;
-  border: 1.5px solid var(--color-borde-suave);
+  border: 1.5px solid var(--color-borde);
   border-radius: 6px;
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   color: var(--color-texto);
   transition: var(--transicion);
 }
@@ -448,7 +504,7 @@ input[type="number"] {
 .campo select:focus {
   outline: none;
   border-color: var(--color-turquesa);
-  box-shadow: 0 0 0 3px rgba(22, 124, 128, 0.18);
+  box-shadow: 0 0 0 3px rgba(44, 206, 210, 0.25);
 }
 
 .campo-ayuda {
@@ -456,14 +512,14 @@ input[type="number"] {
   color: var(--color-texto-suave);
 }
 
-/* Modales */
+/* //* Ventanas modales del sistema */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(14, 38, 46, 0.65);
+  background-color: rgba(38, 71, 78, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -473,14 +529,14 @@ input[type="number"] {
 }
 
 .modal-caja {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   border-radius: 12px;
   width: 100%;
   max-width: 580px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(18, 72, 90, 0.25);
-  border: 1px solid var(--color-borde-suave);
+  box-shadow: 0 20px 40px rgba(38, 71, 78, 0.20);
+  border: 1px solid var(--color-borde);
 }
 
 .modal-header {
@@ -489,12 +545,12 @@ input[type="number"] {
   justify-content: space-between;
   padding: 18px 24px;
   border-bottom: 1px solid var(--color-borde-suave);
-  background-color: var(--color-arena-claro);
+  background-color: var(--color-celeste-suave-fondo);
 }
 
 .modal-header h3 {
   font-size: 1.3rem;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
 }
 
 .modal-cerrar {
@@ -509,17 +565,17 @@ input[type="number"] {
 
 .modal-cerrar:hover {
   color: var(--color-error);
-  background-color: rgba(197, 48, 48, 0.1);
+  background-color: rgba(220, 38, 38, 0.1);
 }
 
 .modal-body {
   padding: 24px;
 }
 
-/* Desglose de tarifa */
+/* //* Tarjetas informativas secundarias en celeste agua suave */
 .desglose-tarifa {
-  background-color: var(--color-arena-claro);
-  border: 1px solid var(--color-borde-suave);
+  background-color: var(--color-celeste-suave-fondo);
+  border: 1px solid var(--color-celeste-suave);
   border-radius: 8px;
   padding: 16px;
   margin: 12px 0;
@@ -530,17 +586,17 @@ input[type="number"] {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   margin-bottom: 12px;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--color-borde-suave);
+  border-bottom: 1px solid var(--color-borde);
 }
 
 .desglose-fila {
   display: flex;
   justify-content: space-between;
   font-size: 0.92rem;
-  color: var(--color-texto);
+  color: var(--color-azul-petroleo);
   margin-bottom: 6px;
 }
 
@@ -550,10 +606,10 @@ input[type="number"] {
   border-top: 1.5px dashed var(--color-turquesa);
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
 }
 
-/* Alertas */
+/* //* Mensajes de alerta accesibles */
 .alerta {
   padding: 12px 16px;
   border-radius: 8px;
@@ -566,27 +622,27 @@ input[type="number"] {
 }
 
 .alerta-exito {
-  background-color: var(--color-exito-fondo);
-  color: var(--color-turquesa);
-  border: 1px solid var(--color-verde-agua);
+  background-color: var(--color-celeste-suave-fondo);
+  color: var(--color-azul-petroleo);
+  border: 1px solid var(--color-turquesa);
 }
 
 .alerta-error {
   background-color: var(--color-error-fondo);
   color: var(--color-error);
-  border: 1px solid #FEB2B2;
+  border: 1px solid #FCA5A5;
 }
 
 .alerta-aviso {
   background-color: var(--color-aviso-fondo);
   color: var(--color-aviso);
-  border: 1px solid #FAF089;
+  border: 1px solid #FCD34D;
 }
 
 .alerta-info {
-  background-color: #EBF8FF;
-  color: var(--color-azul-oceano);
-  border: 1px solid #BEE3F8;
+  background-color: var(--color-celeste-suave-fondo);
+  color: var(--color-azul-petroleo);
+  border: 1px solid var(--color-turquesa);
 }
 
 /* Indicador de procesamiento */
@@ -598,8 +654,8 @@ input[type="number"] {
 .procesando-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid var(--color-borde-suave);
-  border-top-color: var(--color-turquesa);
+  border: 4px solid var(--color-celeste-suave);
+  border-top-color: var(--color-naranja-coral);
   border-radius: 50%;
   animation: girar 0.9s linear infinite;
   margin: 0 auto 20px auto;
@@ -614,7 +670,7 @@ input[type="number"] {
 .procesando-texto {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   margin-bottom: 8px;
 }
 
@@ -623,23 +679,23 @@ input[type="number"] {
   color: var(--color-texto-suave);
 }
 
-/* Comprobante formal de reserva */
+/* //* Comprobante oficial de reserva */
 .comprobante-reserva-formal {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
 }
 
 .comprobante-encabezado {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid var(--color-azul-oceano);
+  border-bottom: 2px solid var(--color-azul-petroleo);
   padding-bottom: 12px;
   margin-bottom: 18px;
 }
 
 .comprobante-marca-titulo {
   font-size: 1.45rem;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   font-weight: 800;
   margin: 0;
 }
@@ -661,9 +717,9 @@ input[type="number"] {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: var(--color-verde-agua-claro);
-  color: var(--color-turquesa);
-  border: 2px solid var(--color-verde-agua);
+  background-color: var(--color-celeste-suave);
+  color: var(--color-azul-petroleo);
+  border: 2px solid var(--color-turquesa);
   font-size: 2rem;
   display: flex;
   align-items: center;
@@ -673,8 +729,8 @@ input[type="number"] {
 }
 
 .reserva-codigo-caja {
-  background-color: var(--color-arena-claro);
-  border: 2px solid var(--color-azul-oceano);
+  background-color: var(--color-celeste-suave-fondo);
+  border: 2px solid var(--color-azul-petroleo);
   border-radius: 8px;
   padding: 14px;
   text-align: center;
@@ -693,14 +749,14 @@ input[type="number"] {
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 2px;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   margin-top: 4px;
 }
 
 .comprobante-tabla-datos {
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
   border-radius: 8px;
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   margin-bottom: 18px;
   overflow: hidden;
 }
@@ -735,23 +791,23 @@ input[type="number"] {
   line-height: 1.4;
 }
 
-/* Tarjeta de consulta en Mis Reservas */
+/* //* Tarjetas de consulta y autogestión de reservas */
 .tarjeta-consulta {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   padding: 28px;
   border-radius: 12px;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
   max-width: 540px;
   margin: 0 auto;
 }
 
 .tarjeta-reserva-detalle {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   border-radius: 12px;
   padding: 28px;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
 }
 
 .reserva-header-detalle {
@@ -788,6 +844,7 @@ input[type="number"] {
   color: var(--color-texto);
 }
 
+/* //* Badges de estado en celeste agua suave y colores semánticos */
 .badge-estado {
   display: inline-block;
   padding: 5px 12px;
@@ -798,25 +855,27 @@ input[type="number"] {
 }
 
 .badge-confirmada {
-  background-color: var(--color-verde-agua-claro);
-  color: var(--color-turquesa);
-  border: 1px solid var(--color-verde-agua);
+  background-color: var(--color-celeste-suave);
+  color: var(--color-azul-petroleo);
+  border: 1px solid var(--color-turquesa);
 }
 
 .badge-pendiente {
-  background-color: var(--color-aviso-fondo);
-  color: var(--color-aviso);
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FCD34D;
 }
 
 .badge-cancelada {
   background-color: var(--color-error-fondo);
-  color: var(--color-error);
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
 }
 
 .badge-rechazada {
-  background-color: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fca5a5;
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FCA5A5;
 }
 
 .acciones-reserva {
@@ -826,13 +885,13 @@ input[type="number"] {
   margin-top: 14px;
 }
 
-/* Panel Administrativo */
+/* //* Panel Administrativo y tablas con encabezados celestes */
 .admin-login-caja {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   padding: 32px;
   border-radius: 12px;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
   max-width: 440px;
   margin: 0 auto;
 }
@@ -867,16 +926,16 @@ input[type="number"] {
 }
 
 .admin-tab-btn.activo {
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   border-bottom-color: var(--color-turquesa);
 }
 
 .tabla-responsive {
   overflow-x: auto;
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   border-radius: 10px;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
 }
 
 .tabla-admin {
@@ -886,12 +945,12 @@ input[type="number"] {
 }
 
 .tabla-admin th {
-  background-color: var(--color-arena-claro);
-  color: var(--color-azul-oceano);
+  background-color: var(--color-celeste-suave);
+  color: var(--color-azul-petroleo);
   padding: 12px 16px;
   text-align: left;
   font-weight: 700;
-  border-bottom: 1.5px solid var(--color-borde-suave);
+  border-bottom: 1.5px solid var(--color-turquesa);
 }
 
 .tabla-admin td {
@@ -905,21 +964,21 @@ input[type="number"] {
 }
 
 .tabla-admin tr:hover {
-  background-color: rgba(117, 185, 174, 0.08);
+  background-color: var(--color-celeste-suave-fondo);
 }
 
-/* Seccion de agencia */
+/* //* Sección informativa de la agencia */
 .agencia-contenedor {
-  background-color: var(--color-blanco-calido);
+  background-color: var(--color-blanco);
   padding: 36px;
   border-radius: 12px;
   box-shadow: var(--sombra-suave);
-  border: 1px solid var(--color-borde-suave);
+  border: 1px solid var(--color-borde);
 }
 
 .agencia-intro {
   font-size: 1.15rem;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   line-height: 1.7;
   margin-bottom: 20px;
 }
@@ -931,7 +990,7 @@ input[type="number"] {
 }
 
 .pilar-card {
-  background-color: var(--color-arena-claro);
+  background-color: var(--color-celeste-suave-fondo);
   padding: 22px;
   border-radius: 10px;
   border: 1px solid var(--color-borde-suave);
@@ -939,7 +998,7 @@ input[type="number"] {
 
 .pilar-titulo {
   font-size: 1.05rem;
-  color: var(--color-azul-oceano);
+  color: var(--color-azul-petroleo);
   margin-bottom: 8px;
 }
 
@@ -949,9 +1008,9 @@ input[type="number"] {
   line-height: 1.5;
 }
 
-/* Pie de pagina */
+/* //* Pie de página institucional en azul petróleo profundo */
 .footer {
-  background-color: var(--color-azul-oceano);
+  background-color: var(--color-azul-petroleo);
   color: #FFFFFF;
   padding: 48px 0 24px 0;
   margin-top: auto;
@@ -965,13 +1024,13 @@ input[type="number"] {
 }
 
 .footer-col h4 {
-  color: var(--color-blanco-calido);
+  color: #FFFFFF;
   font-size: 1.1rem;
   margin-bottom: 14px;
 }
 
 .footer-col p {
-  color: #D4E7E3;
+  color: #E2EFF0;
   font-size: 0.9rem;
   line-height: 1.6;
 }
@@ -986,7 +1045,7 @@ input[type="number"] {
 .footer-enlaces button {
   background: none;
   border: none;
-  color: #D4E7E3;
+  color: #E2EFF0;
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0;
@@ -995,17 +1054,17 @@ input[type="number"] {
 }
 
 .footer-enlaces button:hover {
-  color: var(--color-blanco-calido);
+  color: var(--color-turquesa);
   text-decoration: underline;
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 20px;
   display: flex;
   justify-content: space-between;
   font-size: 0.82rem;
-  color: #B2D1CB;
+  color: #D1E5E7;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -1014,7 +1073,7 @@ input[type="number"] {
   display: none;
 }
 
-/* Impresion limpia para comprobante PDF */
+/* //* Impresión limpia para comprobante oficial PDF */
 @media print {
   @page {
     size: portrait;
@@ -1092,7 +1151,7 @@ input[type="number"] {
 
   .comprobante-reserva-formal,
   .tarjeta-reserva-detalle {
-    border: 2px solid #12485A !important;
+    border: 2px solid #26474E !important;
     border-radius: 8px !important;
     padding: 24px !important;
     margin: 0 auto !important;
@@ -1104,54 +1163,54 @@ input[type="number"] {
 
   .comprobante-encabezado {
     display: flex !important;
-    border-bottom: 2px solid #12485A !important;
+    border-bottom: 2px solid #26474E !important;
     margin-bottom: 16px !important;
   }
 
   .comprobante-marca-titulo {
-    color: #12485A !important;
+    color: #26474E !important;
   }
 
   .reserva-codigo-caja {
-    border: 2px solid #12485A !important;
-    background-color: #F8FAFC !important;
+    border: 2px solid #26474E !important;
+    background-color: #EAF8F8 !important;
     margin: 12px 0 16px 0 !important;
     padding: 10px !important;
   }
 
   .reserva-codigo-valor {
-    color: #12485A !important;
+    color: #26474E !important;
     font-size: 1.6rem !important;
   }
 
   .comprobante-tabla-datos {
-    border: 1px solid #CBD5E1 !important;
+    border: 1px solid #D1E5E7 !important;
     margin-bottom: 14px !important;
   }
 
   .comprobante-dato-fila {
-    border-bottom: 1px solid #E2E8F0 !important;
+    border-bottom: 1px solid #E2EFF0 !important;
     padding: 8px 12px !important;
   }
 
   .desglose-tarifa {
-    border: 1px solid #CBD5E1 !important;
-    background-color: #F8FAFC !important;
+    border: 1px solid #D1E5E7 !important;
+    background-color: #EAF8F8 !important;
     padding: 12px !important;
     margin: 14px 0 !important;
   }
 
   .desglose-fila.total {
-    border-top: 1.5px solid #12485A !important;
-    color: #12485A !important;
+    border-top: 1.5px solid #26474E !important;
+    color: #26474E !important;
   }
 
   .badge-estado {
-    border: 1px solid #12485A !important;
+    border: 1px solid #26474E !important;
   }
 }
 
-/* Responsivo para moviles */
+/* //* Adaptación responsiva para móviles */
 @media (max-width: 868px) {
   .menu-toggle {
     display: block;
@@ -1162,7 +1221,7 @@ input[type="number"] {
     top: 72px;
     left: 0;
     right: 0;
-    background-color: var(--color-azul-oceano);
+    background-color: var(--color-azul-petroleo);
     flex-direction: column;
     padding: 24px;
     gap: 16px;

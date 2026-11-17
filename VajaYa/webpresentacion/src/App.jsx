@@ -86,7 +86,7 @@ export default function App() {
         )}
 
         {seccionActiva === 'mis-reservas' && (
-          <MisReservasView />
+          <MisReservasView destinos={destinos} />
         )}
 
         {seccionActiva === 'agencia' && (

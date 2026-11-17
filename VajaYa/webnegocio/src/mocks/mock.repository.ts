@@ -112,11 +112,27 @@ export class MockReservaRepository implements IReservaRepository {
 
   //* Inserta una nueva reserva con estado y código ya calculados por el servicio.
   async create(
-    data: CreateReservaDto & { estado: EstadoReserva; codigoConfirmacion: string | null }
+    data: CreateReservaDto & {
+      estado: EstadoReserva;
+      codigoConfirmacion: string | null;
+      destinoNombre?: string;
+      nombreDestino?: string;
+    }
   ): Promise<Reserva> {
+    const nombreDestino =
+      data.destinoNombre ||
+      data.nombreDestino ||
+      (data.destinoId === 'dest-001'
+        ? 'Playa Tamarindo'
+        : data.destinoId === 'dest-002'
+        ? 'Volcán Arenal'
+        : 'Destino turístico');
+
     const nueva: Reserva = {
       id: uuidv4(),
       destinoId: data.destinoId,
+      destinoNombre: nombreDestino,
+      nombreDestino: nombreDestino,
       clienteNombre: data.clienteNombre,
       clienteEmail: data.clienteEmail,
       fechaViaje: data.fechaViaje,

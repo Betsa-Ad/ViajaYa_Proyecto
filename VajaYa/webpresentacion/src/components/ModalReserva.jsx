@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { crearReserva, getCuposDisponibles } from '../services/api';
-import { formatearColones } from '../utils/imagenes';
+import { formatearColones, resolverNombreDestino } from '../utils/imagenes';
 import Alerta from './Alerta';
 
 // Modal de cotizacion, pago y emision de comprobante con calculo de cupos disponibles (RN-01)
@@ -155,7 +155,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
       <div className="modal-caja" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header no-print">
           <div>
-            <h3>{reservaCreada ? 'Comprobante de Reserva' : `Reservar: ${destino.nombre}`}</h3>
+            <h3>{reservaCreada ? 'Comprobante de Reserva' : `Reservar: ${resolverNombreDestino(null, destino)}`}</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-texto-suave)' }}>
               Capacidad máxima permitida: {destino.capacidadDiaria} personas por día
             </span>
@@ -205,7 +205,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
                       ¡Pago y Reserva Aprobados!
                     </h3>
                     <p style={{ color: 'var(--color-texto-suave)', fontSize: '0.92rem' }}>
-                      Tu viaje a <strong>{destino.nombre}</strong> ha sido confirmado con éxito.
+                      Tu viaje a <strong>{resolverNombreDestino(reservaCreada, destino)}</strong> ha sido confirmado con éxito.
                     </p>
                   </>
                 )}
@@ -221,7 +221,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
               <div className="comprobante-tabla-datos">
                 <div className="comprobante-dato-fila">
                   <span className="comprobante-dato-etiqueta">Destino:</span>
-                  <span className="comprobante-dato-valor"><strong>{destino.nombre}</strong></span>
+                  <span className="comprobante-dato-valor"><strong>{resolverNombreDestino(reservaCreada, destino)}</strong></span>
                 </div>
                 <div className="comprobante-dato-fila">
                   <span className="comprobante-dato-etiqueta">Nombre del Cliente:</span>
@@ -272,7 +272,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
               <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
                 <button
                   type="button"
-                  className="btn btn-turquesa"
+                  className="btn btn-secundario"
                   onClick={handleDescargarPDF}
                   style={{ width: '100%' }}
                 >
@@ -418,7 +418,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
 
               <button
                 type="submit"
-                className="btn btn-turquesa"
+                className="btn btn-cta"
                 disabled={cargando || superaCapacidad || sinCupos}
                 style={{ width: '100%', marginTop: '10px', fontSize: '1rem' }}
               >

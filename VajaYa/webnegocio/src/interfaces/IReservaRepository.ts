@@ -6,6 +6,8 @@ export type EstadoReserva = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'RECHAZAD
 export interface Reserva {
   id: string;
   destinoId: string;
+  destinoNombre?: string;
+  nombreDestino?: string;
   clienteNombre: string;
   clienteEmail: string;
   fechaViaje: string; // 'YYYY-MM-DD'

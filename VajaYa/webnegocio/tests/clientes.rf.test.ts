@@ -123,9 +123,11 @@ describe('Suite de Pruebas Unitarias RF-01 a RF-06 (Clientes y Reservas)', () =>
     // Act: envía la creación de la reserva
     const reserva = await reservaService.crearReserva(datosReserva);
 
-    // Assert: verifica estado confirmado y formato oficial del código
+    // Assert: verifica estado confirmado, nombre del destino y formato oficial del código
     expect(reserva.estado).toBe('CONFIRMADA');
     expect(reserva.codigoConfirmacion).toMatch(/^VY-\d{4}-\d{2}$/);
+    expect(reserva.destinoNombre).toBe('Playa Tamarindo');
+    expect(reserva.nombreDestino).toBe('Playa Tamarindo');
   });
 
   // RF-03: Registrar reserva con tarjeta impar (estado RECHAZADO guardado en BD sin descontar cupo)
@@ -167,10 +169,12 @@ describe('Suite de Pruebas Unitarias RF-01 a RF-06 (Clientes y Reservas)', () =>
     // Act: consulta la reserva ingresando su código y correo
     const consultada = await reservaService.obtenerPorCodigo(reserva.codigoConfirmacion!, 'maria@test.com');
 
-    // Assert: valida que la reserva retornada sea la correcta
+    // Assert: valida que la reserva retornada sea la correcta y contenga el nombre del destino
     expect(consultada).toBeDefined();
     expect(consultada.id).toBe(reserva.id);
     expect(consultada.clienteEmail).toBe('maria@test.com');
+    expect(consultada.destinoNombre).toBe('Playa Tamarindo');
+    expect(consultada.nombreDestino).toBe('Playa Tamarindo');
   });
 
   // RF-04: Denegar consulta si el correo no coincide con el código de reserva

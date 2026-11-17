@@ -35,14 +35,14 @@ export default function Footer({ onCambiarSeccion }) {
           <div className="footer-col">
             <h4>Transparencia</h4>
             <ul className="footer-enlaces">
-              <li><span style={{ color: '#D4E7E3' }}>IVA 13% incluido en cotizaciones</span></li>
-              <li><span style={{ color: '#D4E7E3' }}>Reprogramación flexible (48h antes)</span></li>
-              <li><span style={{ color: '#D4E7E3' }}>Control estricto de cupos diarios</span></li>
+              <li><span style={{ color: 'var(--color-celeste-suave)' }}>IVA 13% incluido en cotizaciones</span></li>
+              <li><span style={{ color: 'var(--color-celeste-suave)' }}>Reprogramación flexible (48h antes)</span></li>
+              <li><span style={{ color: 'var(--color-celeste-suave)' }}>Control estricto de cupos diarios</span></li>
               <li>
                 <button
                   type="button"
                   onClick={() => onCambiarSeccion('admin')}
-                  style={{ color: 'var(--color-verde-agua)', textDecoration: 'underline', marginTop: '6px', fontWeight: 600 }}
+                  style={{ color: 'var(--color-turquesa)', textDecoration: 'underline', marginTop: '6px', fontWeight: 600 }}
                 >
                   Acceso Administrativo (/admin)
                 </button>

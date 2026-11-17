@@ -43,11 +43,16 @@ class ReservaService {
         const codigoConfirmacion = this.generarCodigoConfirmacion();
         const estadoReserva = esPar ? 'CONFIRMADA' : 'RECHAZADA';
         try {
-            return await this.reservaRepo.create({
+            const reservaCreada = await this.reservaRepo.create({
                 ...data,
                 estado: estadoReserva,
                 codigoConfirmacion,
             });
+            if (!reservaCreada.destinoNombre)
+                reservaCreada.destinoNombre = destino.nombre;
+            if (!reservaCreada.nombreDestino)
+                reservaCreada.nombreDestino = destino.nombre;
+            return reservaCreada;
         }
         catch (err) {
             if (err.message && err.message.includes('Cupo insuficiente')) {
@@ -56,11 +61,18 @@ class ReservaService {
             throw err;
         }
     }
-    //* Obtiene una reserva por ID; lanza 404 si no existe.
+    //* Obtiene una reserva por ID resolviendo el nombre del destino (SOLID).
     async obtenerReserva(id) {
         const reserva = await this.reservaRepo.findById(id);
         if (!reserva) {
             throw new validaciones_1.BusinessError('Reserva no encontrada', `No existe una reserva con ID ${id}.`, 404);
+        }
+        if (!reserva.destinoNombre || !reserva.nombreDestino) {
+            const destino = await this.destinoRepo.findById(reserva.destinoId);
+            if (destino) {
+                reserva.destinoNombre = reserva.destinoNombre || destino.nombre;
+                reserva.nombreDestino = reserva.nombreDestino || destino.nombre;
+            }
         }
         return reserva;
     }
@@ -75,6 +87,13 @@ class ReservaService {
         }
         if (correo && reserva.clienteEmail.toLowerCase() !== correo.trim().toLowerCase()) {
             throw new validaciones_1.BusinessError('Acceso denegado', 'El correo no coincide con la reserva.', 403);
+        }
+        if (!reserva.destinoNombre || !reserva.nombreDestino) {
+            const destino = await this.destinoRepo.findById(reserva.destinoId);
+            if (destino) {
+                reserva.destinoNombre = reserva.destinoNombre || destino.nombre;
+                reserva.nombreDestino = reserva.nombreDestino || destino.nombre;
+            }
         }
         return reserva;
     }
@@ -99,19 +118,33 @@ class ReservaService {
         }
         return this.reservaRepo.updateEstadoPago(id, estadoPago);
     }
-    //* Obtiene las reservas asociadas al correo de un cliente.
+    //* Obtiene las reservas asociadas al correo de un cliente con el nombre del destino (SOLID).
     async obtenerPorCorreo(correo) {
         if (!this.reservaRepo.findByCorreo) {
             throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta búsqueda por correo.', 500);
         }
-        return this.reservaRepo.findByCorreo(correo);
+        const reservas = await this.reservaRepo.findByCorreo(correo);
+        for (const r of reservas) {
+            if (!r.destinoNombre || !r.nombreDestino) {
+                const destino = await this.destinoRepo.findById(r.destinoId);
+                if (destino) {
+                    r.destinoNombre = r.destinoNombre || destino.nombre;
+                    r.nombreDestino = r.nombreDestino || destino.nombre;
+                }
+            }
+        }
+        return reservas;
     }
     //* CAR-06: Lista todas las reservas registradas para monitoreo y auditoría administrativa.
     async listarTodas() {
         if (!this.reservaRepo.findAll) {
             throw new validaciones_1.BusinessError('Operación no soportada', 'El repositorio no soporta listar todas las reservas.', 500);
         }
-        return this.reservaRepo.findAll();
+        const reservas = await this.reservaRepo.findAll();
+        return reservas.map((r) => ({
+            ...r,
+            nombreDestino: r.nombreDestino || r.destinoNombre,
+        }));
     }
     //! RN-02: Cancelación solo permitida si faltan ESTRICTAMENTE MÁS de 48 horas para el viaje.
     async cancelarReserva(id) {

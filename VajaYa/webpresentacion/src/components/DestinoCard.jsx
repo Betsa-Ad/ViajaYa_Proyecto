@@ -37,7 +37,7 @@ export default function DestinoCard({ destino, onVerMas }) {
 
         <button
           type="button"
-          className="btn btn-turquesa"
+          className="btn btn-cta"
           onClick={() => onVerMas(destino)}
           style={{ width: '100%' }}
         >

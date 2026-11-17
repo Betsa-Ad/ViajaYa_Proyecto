@@ -47,7 +47,7 @@ export default function InicioView({ destinos, cargando, error, onNavegarDestino
           <div style={{ textAlign: 'center', marginTop: '40px' }}>
             <button
               type="button"
-              className="btn btn-turquesa"
+              className="btn btn-cta"
               onClick={onNavegarDestinos}
               style={{ padding: '12px 32px' }}
             >

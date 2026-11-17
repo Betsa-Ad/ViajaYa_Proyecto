@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { getReservaPorCodigo, reprogramarReserva, cancelarReserva } from '../services/api';
-import { formatearColones } from '../utils/imagenes';
+import { formatearColones, resolverNombreDestino } from '../utils/imagenes';
 import Alerta from '../components/Alerta';
 
 // Vista de autogestion de reservas sin contrasenas
-export default function MisReservasView() {
+export default function MisReservasView({ destinos = [] }) {
   const [codigo, setCodigo] = useState('');
   const [correo, setCorreo] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -199,7 +199,7 @@ export default function MisReservasView() {
             <div className="reserva-grid-info">
               <div className="info-item">
                 <span className="info-label">Destino</span>
-                <span className="info-valor"><strong>{reserva.destinoNombre || `Destino #${reserva.destinoId}`}</strong></span>
+                <span className="info-valor"><strong>{resolverNombreDestino(reserva, null, destinos)}</strong></span>
               </div>
 
               <div className="info-item">
@@ -274,7 +274,7 @@ export default function MisReservasView() {
             <div className="acciones-reserva no-print">
               <button
                 type="button"
-                className="btn btn-turquesa btn-sm"
+                className="btn btn-secundario btn-sm"
                 onClick={handleDescargarPDF}
               >
                 Descargar comprobante en PDF
