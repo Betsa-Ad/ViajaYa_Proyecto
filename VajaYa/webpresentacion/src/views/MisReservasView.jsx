@@ -17,7 +17,7 @@ export default function MisReservasView({ destinos = [] }) {
   const [nuevaFecha, setNuevaFecha] = useState('');
   const [cargandoAccion, setCargandoAccion] = useState(false);
 
-  // Consulta la reserva por codigo y verifica que el correo coincida
+  //* Consulta la reserva enviando código y correo al backend (RF-04)
   const handleConsultar = async (e) => {
     e.preventDefault();
     setError('');
@@ -27,6 +27,7 @@ export default function MisReservasView({ destinos = [] }) {
     const codLimpio = codigo.trim();
     const corLimpio = correo.trim().toLowerCase();
 
+    //! Valida que ambos campos requeridos estén completos
     if (!codLimpio || !corLimpio) {
       setError('Por favor ingrese tanto el código de confirmación como su correo electrónico.');
       return;
@@ -34,14 +35,11 @@ export default function MisReservasView({ destinos = [] }) {
 
     setCargando(true);
     try {
-      const data = await getReservaPorCodigo(codLimpio);
-
-      if (!data || data.clienteEmail?.toLowerCase() !== corLimpio) {
-        throw new Error('No se encontró ninguna reserva que coincida con ese código y correo electrónico.');
-      }
-
+      //* El backend valida el código y la coincidencia del correo (RFC 7807)
+      const data = await getReservaPorCodigo(codLimpio, corLimpio);
       setReserva(data);
     } catch (err) {
+      //! Muestra el mensaje de error provisto por el backend
       setError(err.message || 'Error al consultar la reserva.');
     } finally {
       setCargando(false);

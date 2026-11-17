@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReservaService = exports.validarCantidadPersonas = exports.BusinessError = void 0;
-const cotizacion_service_1 = require("./cotizacion.service");
 const validaciones_1 = require("./validaciones");
 Object.defineProperty(exports, "BusinessError", { enumerable: true, get: function () { return validaciones_1.BusinessError; } });
 Object.defineProperty(exports, "validarCantidadPersonas", { enumerable: true, get: function () { return validaciones_1.validarCantidadPersonas; } });
@@ -10,7 +9,6 @@ class ReservaService {
     constructor(reservaRepo, destinoRepo) {
         this.reservaRepo = reservaRepo;
         this.destinoRepo = destinoRepo;
-        this.cotizacionService = new cotizacion_service_1.CotizacionService();
     }
     //* Crea una reserva aplicando RN-01 (cupos), RN-03 (tarifa) y RN-04 (pago simulado).
     async crearReserva(data) {
@@ -28,11 +26,6 @@ class ReservaService {
             const disponibles = destino.capacidadDiaria - personasOcupadas;
             throw new validaciones_1.BusinessError('Cupo insuficiente', `Solo hay ${disponibles} cupo(s) disponibles para esa fecha.`, 409);
         }
-        //! RN-03: Calcular la tarifa usando el servicio de cotización.
-        const _cotizacion = this.cotizacionService.calcular({
-            precioBase: destino.precioBase,
-            numPersonas: data.numPersonas,
-        });
         //! RN-04: Gateway simulado por paridad del último dígito de la tarjeta.
         const ultimoDigito = parseInt(data.ultimosDigitosTarjeta[data.ultimosDigitosTarjeta.length - 1], 10);
         if (isNaN(ultimoDigito)) {

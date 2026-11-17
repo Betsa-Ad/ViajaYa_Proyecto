@@ -9,7 +9,6 @@ import {
   CreateReservaDto,
   ReservaAuditoria,
 } from '../interfaces/IReservaRepository';
-import { CotizacionService } from './cotizacion.service';
 import { BusinessError, validarCantidadPersonas } from './validaciones';
 
 export { BusinessError, validarCantidadPersonas };
@@ -17,8 +16,6 @@ export { BusinessError, validarCantidadPersonas };
 // Servicio 
 
 export class ReservaService {
-  private readonly cotizacionService = new CotizacionService();
-
   constructor(
     private readonly reservaRepo: IReservaRepository,
     private readonly destinoRepo: IDestinoRepository
@@ -49,12 +46,6 @@ export class ReservaService {
         409
       );
     }
-
-    //! RN-03: Calcular la tarifa usando el servicio de cotización.
-    const _cotizacion = this.cotizacionService.calcular({
-      precioBase: destino.precioBase,
-      numPersonas: data.numPersonas,
-    });
 
     //! RN-04: Gateway simulado por paridad del último dígito de la tarjeta.
     const ultimoDigito = parseInt(

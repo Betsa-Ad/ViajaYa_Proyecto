@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { crearReserva, getCuposDisponibles } from '../services/api';
+import { crearReserva, getCuposDisponibles, cotizarTarifa } from '../services/api';
 import { formatearColones, resolverNombreDestino } from '../utils/imagenes';
 import Alerta from './Alerta';
 
@@ -20,6 +20,7 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
   const [procesandoPago, setProcesandoPago] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
   const [reservaCreada, setReservaCreada] = useState(null);
+  const [cotizacion, setCotizacion] = useState(null);
 
   // Consulta el cupo real disponible para la fecha seleccionada
   useEffect(() => {
@@ -45,22 +46,44 @@ export default function ModalReserva({ destino, onCerrar, onReservaExitosa }) {
     };
   }, [destino.id, destino.capacidadDiaria, fechaViaje]);
 
-  // Calculo de tarifa con desglose de subtotal, iva 13% y total
+  //* Parseo y validación de cantidad de personas (entero mayor o igual a 1)
   const personasEntero = parseInt(numPersonas, 10);
   const esCantidadValida = Number.isInteger(personasEntero) && personasEntero >= 1 && String(numPersonas).trim() === String(personasEntero);
   const personasParaCalculo = esCantidadValida ? personasEntero : 0;
 
-  const subtotal = useMemo(() => {
-    return destino.precioBase * personasParaCalculo;
-  }, [destino.precioBase, personasParaCalculo]);
+  //* Consume la cotización oficial del backend al cambiar personas o destino (RF-02)
+  useEffect(() => {
+    let activo = true;
+    if (!esCantidadValida || !destino.precioBase) {
+      setCotizacion(null);
+      return;
+    }
 
-  const iva = useMemo(() => {
-    return Math.round(subtotal * 0.13 * 100) / 100;
-  }, [subtotal]);
+    const consultarCotizacion = async () => {
+      try {
+        const resultado = await cotizarTarifa(destino.precioBase, personasEntero);
+        if (activo && resultado) {
+          setCotizacion(resultado);
+        }
+      } catch {
+        //! Si ocurre un fallo temporal, se mantiene el cálculo local como respaldo
+      }
+    };
 
-  const total = useMemo(() => {
-    return Math.round((subtotal + iva) * 100) / 100;
-  }, [subtotal, iva]);
+    consultarCotizacion();
+    return () => {
+      activo = false;
+    };
+  }, [destino.precioBase, personasEntero, esCantidadValida]);
+
+  //* Cálculo local simple de tarifa mientras responde la API o como respaldo (RN-03)
+  const subtotalLocal = destino.precioBase * personasParaCalculo;
+  const ivaLocal = Math.round(subtotalLocal * 0.13 * 100) / 100;
+  const totalLocal = Math.round((subtotalLocal + ivaLocal) * 100) / 100;
+
+  const subtotal = cotizacion?.subtotal ?? subtotalLocal;
+  const iva = cotizacion?.iva ?? ivaLocal;
+  const total = cotizacion?.total ?? totalLocal;
 
   // Validacion de cupo maximo disponible para la fecha
   const sinCupos = cuposDisponibles <= 0;

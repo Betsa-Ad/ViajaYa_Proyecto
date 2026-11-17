@@ -67,7 +67,7 @@ export async function getCuposDisponibles(destinoId, fecha) {
   }
 }
 
-// Cotizar tarifa sin persistir datos
+//* Cotiza tarifa en el backend calculando subtotal, IVA 13% y total (RF-02 / RN-03)
 export async function cotizarTarifa(precioBase, numPersonas) {
   const res = await request('/cotizar', {
     method: 'POST',
@@ -85,9 +85,10 @@ export async function crearReserva(datosReserva) {
   return res.data;
 }
 
-// Consultar reserva por codigo de confirmacion
-export async function getReservaPorCodigo(codigo) {
-  const res = await request(`/reservas/codigo/${encodeURIComponent(codigo)}`);
+//* Consulta una reserva por su código único y valida el correo en el backend (RF-04)
+export async function getReservaPorCodigo(codigo, correo) {
+  const parametroCorreo = correo ? `?correo=${encodeURIComponent(correo)}` : '';
+  const res = await request(`/reservas/codigo/${encodeURIComponent(codigo)}${parametroCorreo}`);
   return res.data;
 }
 
